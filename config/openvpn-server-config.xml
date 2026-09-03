@@ -1,284 +1,61 @@
 <?xml version="1.0"?>
+<!-- OPNsense OpenVPN Server - Maximum Security Configuration -->
+<!-- Version: 1.0.0 | Date: 2026-09-03 -->
+
 <openvpn_server>
-  <!-- OPNsense OpenVPN Server - Maximum Security Configuration -->
-  <!-- Version: 1.0.0 | Date: 2026-09-03 -->
-  
+  <!-- Basic Server Settings -->
   <general>
-    <!-- Basic Server Settings -->
     <enabled>1</enabled>
     <description>OpenVPN Server - Maximum Security (TLS 1.3, AES-256-GCM)</description>
     <protocol>UDP</protocol>
     <port>1194</port>
-    <ipv6>0</ipv6>
-    
-    <!-- Network Configuration -->
     <tunnel_network>10.8.0.0</tunnel_network>
-    <tunnel_networkv6/>
     <local_network>192.168.226.0/24,192.168.20.0/24,192.168.30.0/24</local_network>
-    <local_networkv6/>
-    <remote_network/>
-    <remote_networkv6/>
-    
-    <!-- Gateway Configuration -->
-    <gwredir>1</gwredir>
-    <duplicate_cn>0</duplicate_cn>
-    <push_redirect_gateway>1</push_redirect_gateway>
-    <push_reset>1</push_reset>
-    
-    <!-- Authentication -->
     <auth_mode>Local Database</auth_mode>
-    <username_as_common_name>0</username_as_common_name>
-    <authservers/>
   </general>
-  
-  <!-- ===== MAXIMUM SECURITY CRYPTOGRAPHY SETTINGS ===== -->
+
+  <!-- MAXIMUM SECURITY CRYPTOGRAPHY -->
   <crypto>
-    <!-- Encryption -->
     <cipher>AES-256-GCM</cipher>
     <cipher_ncp_list>AES-256-GCM:AES-128-GCM</cipher_ncp_list>
-    
-    <!-- Authentication/HMAC -->
     <auth>SHA256</auth>
-    
-    <!-- TLS Configuration (TLS 1.3 MANDATORY) -->
     <tls_version>1.3</tls_version>
     <tls_ciphers>TLS_AES_256_GCM_SHA384</tls_ciphers>
     <tls_ciphersuites>TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256</tls_ciphersuites>
-    
-    <!-- Key Exchange (Elliptic Curve) -->
     <ecdh_curve>secp384r1</ecdh_curve>
-    <tls_groups>secp384r1:secp256r1</tls_groups>
-    
-    <!-- Diffie-Hellman -->
     <dh_bits>4096</dh_bits>
-    
-    <!-- Perfect Forward Secrecy -->
     <pfs_enabled>1</pfs_enabled>
     <renegotiate_seconds>3600</renegotiate_seconds>
-    
-    <!-- Signature Algorithm -->
-    <signature_algorithms>rsa_pss_rsae_sha256:rsa_pss_rsae_sha384:ecdsa_secp256r1_sha256:ecdsa_secp384r1_sha384</signature_algorithms>
-    
-    <!-- Disable Weak/Insecure Ciphers -->
-    <enable_legacy_ciphers>0</enable_legacy_ciphers>
     <disable_compression>1</disable_compression>
   </crypto>
-  
-  <!-- ===== CERTIFICATES AND KEYS ===== -->
-  <certificates>
-    <!-- Server Certificate Reference -->
-    <cert_ref>6a5f6a6e3ce98</cert_ref>
-    
-    <!-- CA Certificate Reference -->
-    <ca_ref>6a5f6a6e3ce97</ca_ref>
-    
-    <!-- DH Parameters -->
-    <dh_ref>6a5f6a6e3ce99</dh_ref>
-    
-    <!-- TLS Auth Key (Optional but Recommended) -->
-    <ta_key>1</ta_key>
-    <ta_key_ref>6a5f6a6e3ce9a</ta_key_ref>
-    
-    <!-- Certificate Verification -->
-    <verify_cert>1</verify_cert>
-    <require_cert_verification>1</require_cert_verification>
-  </certificates>
-  
-  <!-- ===== SECURITY SETTINGS ===== -->
+
+  <!-- SECURITY SETTINGS -->
   <security>
-    <!-- mTLS (Mutual TLS Authentication) -->
     <mtls_enabled>1</mtls_enabled>
-    <mtls_mode>server</mtls_mode>
-    
-    <!-- Certificate Pinning -->
     <cert_pinning_enabled>1</cert_pinning_enabled>
     <verify_x509_name>server</verify_x509_name>
-    <verify_x509_name_type>name</verify_x509_name_type>
-    
-    <!-- Client Certificate Revocation Check -->
     <crl_check>1</crl_check>
-    <crl_check_type>crl</crl_check_type>
-    
-    <!-- Tls-Auth Key (Firewall Evasion Protection) -->
     <tls_auth_enabled>1</tls_auth_enabled>
-    <tls_auth_mode>0</tls_auth_mode>
-    
-    <!-- Extra Validations -->
-    <remote_cert_tls>server</remote_cert_tls>
-    <verify_depth>10</verify_depth>
   </security>
-  
-  <!-- ===== KEEPALIVE AND RECONNECTION ===== -->
+
+  <!-- KEEPALIVE AND RECONNECTION -->
   <keepalive>
-    <!-- Keepalive Ping -->
     <keepalive_interval>10</keepalive_interval>
     <keepalive_timeout>120</keepalive_timeout>
-    
-    <!-- Reconnection Policy -->
     <connect_retry_interval>3</connect_retry_interval>
-    <connect_retry_max>5</connect_retry_max>
-    
-    <!-- Explicit Exit Notify -->
     <explicit_exit_notify>1</explicit_exit_notify>
-    <persist_key>1</persist_key>
-    <persist_tun>1</persist_tun>
   </keepalive>
-  
-  <!-- ===== MTU AND NETWORK TUNING ===== -->
-  <network>
-    <mtu>1500</mtu>
-    <mssfix>1480</mssfix>
-    <fragment>0</fragment>
-    <max_clients>256</max_clients>
-    <max_connections>512</max_connections>
-    
-    <!-- TCP Window Size -->
-    <tcp_window>64</tcp_window>
-    
-    <!-- Disable UDP Fragmentation -->
-    <sndbuf>0</sndbuf>
-    <rcvbuf>0</rcvbuf>
-  </network>
-  
-  <!-- ===== LOGGING AND MONITORING ===== -->
+
+  <!-- LOGGING -->
   <logging>
-    <!-- Log Level -->
     <loglevel>4</loglevel>
-    <verb>4</verb>
-    
-    <!-- Log Files -->
     <logfile>/var/log/openvpn/openvpn.log</logfile>
-    <status_log>/var/log/openvpn/status.log</status_log>
-    <status_log_version>2</status_log_version>
-    
-    <!-- Syslog -->
     <syslog_enabled>1</syslog_enabled>
-    <syslog_facility>LOCAL3</syslog_facility>
-    
-    <!-- OpenVPN Status File Update Frequency -->
-    <status_log_interval>60</status_log_interval>
   </logging>
-  
-  <!-- ===== FIREWALL AND ROUTING ===== -->
-  <firewall>
-    <!-- Enable Firewall Rules -->
-    <firewall_rules_enabled>1</firewall_rules_enabled>
-    
-    <!-- Route Configuration -->
-    <route_mode>adaptive</route_mode>
-    <route_configuration>static</route_configuration>
-    
-    <!-- Client to Client Communication -->
-    <client_to_client>1</client_to_client>
-    <client_to_client_isolation>0</client_to_client_isolation>
-  </firewall>
-  
-  <!-- ===== ADVANCED SETTINGS ===== -->
-  <advanced>
-    <!-- Custom Options (Raw Config) -->
-    <custom_options>
-# ===== SECURITY HARDENING =====
-# Disable weak ciphers and protocols
-min-tls-version 1.3
-no-replay
-replay-protect
 
-# Disable compression (CRIME attack mitigation)
-comp-lzo no
-disable-occ
-
-# Connection limits
-max-clients 256
-max-connections 512
-
-# Script Security
-script-security 2
-
-# Disable unused features
-disable-dco
-proto-force udp
-
-# DNS Configuration
-push "dhcp-option DNS 192.168.226.3"
-push "dhcp-option DOMAIN internal"
-
-# IPv6 routing (if needed)
-# push "route-ipv6 2001:db8::/32"
-
-# Session Timeouts
-inactive 600 30
-auto-exit
-
-# Audit logging
-auth-token-user
-
-# Performance optimization
-txqueuelen 256
-    </custom_options>
-    
-    <!-- Tunnel Mode -->
-    <tunnel_mode>p2p</tunnel_mode>
-    
-    <!-- Plugin Support -->
-    <plugin_auth_enabled>0</plugin_auth_enabled>
-    <plugin_dn_enabled>0</plugin_dn_enabled>
-  </advanced>
-  
-  <!-- ===== PERFORMANCE TUNING ===== -->
-  <performance>
-    <!-- Thread/Worker Settings -->
-    <workers>4</workers>
-    <daemonize>1</daemonize>
-    
-    <!-- Connection Pool -->
-    <pool_enabled>1</pool_enabled>
-    <pool_size>256</pool_size>
-    
-    <!-- Compression (DISABLED for security) -->
-    <compression>none</compression>
-    <compression_level>0</compression_level>
-    
-    <!-- LZ4 Adaptive Compression (DISABLED) -->
-    <lz4_enabled>0</lz4_enabled>
-  </performance>
-  
-  <!-- ===== CROWDSEC INTEGRATION ===== -->
+  <!-- CROWDSEC INTEGRATION -->
   <security_integration>
-    <!-- CrowdSec IDS/IPS -->
     <crowdsec_enabled>1</crowdsec_enabled>
-    <crowdsec_bouncer>firewall</crowdsec_bouncer>
-    
-    <!-- Log to CrowdSec -->
     <log_to_crowdsec>1</log_to_crowdsec>
-    <crowdsec_log_tag>openvpn</crowdsec_log_tag>
   </security_integration>
-  
-  <!-- ===== BACKUP AND RESTORE ===== -->
-  <backup>
-    <backup_enabled>1</backup_enabled>
-    <backup_interval>86400</backup_interval>
-    <backup_location>/var/db/openvpn/backups</backup_location>
-    <max_backups>30</max_backups>
-  </backup>
-  
-  <!-- ===== AUDIT AND COMPLIANCE ===== -->
-  <audit>
-    <audit_enabled>1</audit_enabled>
-    <audit_log>/var/log/openvpn/audit.log</audit_log>
-    <audit_events>auth,connect,disconnect,cert_verify,key_renegotiate</audit_events>
-    <compliance_mode>strict</compliance_mode>
-    <compliance_standard>nist_sp_800-56a</compliance_standard>
-  </audit>
-  
-  <!-- ===== METADATA ===== -->
-  <metadata>
-    <version>1.0.0</version>
-    <created>2026-09-03</created>
-    <last_modified>2026-09-03</last_modified>
-    <security_level>maximum</security_level>
-    <encryption_strength>256-bit</encryption_strength>
-    <tls_minimum>1.3</tls_minimum>
-    <author>OPNsense Security Team</author>
-    <tags>enterprise, maximum-security, tls1.3, aes-256-gcm</tags>
-  </metadata>
 </openvpn_server>

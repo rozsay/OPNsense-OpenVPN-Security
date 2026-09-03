@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<!-- OPNsense Firewall Inbound Rules - OpenVPN Maximum Security -->
+<!-- Version: 1.0.0 | Date: 2026-09-03 -->
+
+<firewall_inbound_rules>
+  <!-- ===== RULE 1: OpenVPN UDP 1194 from WAN ===== -->
+  <rule uuid="openvpn-wan-udp-1194">
+    <type>pass</type>
+    <interface>wan</interface>
+    <direction>in</direction>
+    <ipprotocol>inet</ipprotocol>
+    <protocol>udp</protocol>
+    <source>
+      <any>1</any>
+    </source>
+    <destination>
+      <network>wanip</network>
+      <port>1194</port>
+    </destination>
+    <statetype>keep state</statetype>
+    <log>1</log>
+    <logtype>all</logtype>
+    <quick>1</quick>
+    <descr>OpenVPN UDP 1194 - WAN Inbound (Maximum Security)</descr>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+      <description>OpenVPN security inbound rule</description>
+    </created>
+    <updated>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+      <description>OpenVPN security inbound rule</description>
+    </updated>
+  </rule>
+
+  <!-- ===== RULE 2: OpenVPN TCP 443 (Alternative, if UDP blocked) ===== -->
+  <rule uuid="openvpn-wan-tcp-443">
+    <type>pass</type>
+    <interface>wan</interface>
+    <direction>in</direction>
+    <ipprotocol>inet</ipprotocol>
+    <protocol>tcp</protocol>
+    <source>
+      <any>1</any>
+    </source>
+    <destination>
+      <network>wanip</network>
+      <port>443</port>
+    </destination>
+    <statetype>keep state</statetype>
+    <log>1</log>
+    <quick>1</quick>
+    <descr>OpenVPN TCP 443 - WAN Inbound (Firewall Bypass)</descr>
+    <disabled>1</disabled>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+    </created>
+  </rule>
+
+  <!-- ===== RULE 3: Allow All OpenVPN Interface Traffic ===== -->
+  <rule uuid="openvpn-interface-allow-all">
+    <type>pass</type>
+    <interface>openvpn</interface>
+    <direction>in</direction>
+    <ipprotocol>inet</ipprotocol>
+    <protocol>all</protocol>
+    <source>
+      <any>1</any>
+    </source>
+    <destination>
+      <any>1</any>
+    </destination>
+    <statetype>keep state</statetype>
+    <log>1</log>
+    <quick>1</quick>
+    <descr>Allow All OpenVPN Interface Traffic</descr>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+    </created>
+  </rule>
+
+  <!-- ===== RULE 4: Block CrowdSec Blacklist on WAN ===== -->
+  <rule uuid="crowdsec-wan-block">
+    <type>block</type>
+    <interface>wan</interface>
+    <direction>in</direction>
+    <ipprotocol>inet</ipprotocol>
+    <source>
+      <any>1</any>
+    </source>
+    <destination>
+      <address>crowdsec_blocklists</address>
+    </destination>
+    <statetype>keep state</statetype>
+    <log>1</log>
+    <quick>1</quick>
+    <floating>yes</floating>
+    <descr>Block CrowdSec Blacklist (IDS/IPS)</descr>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+    </created>
+  </rule>
+
+  <!-- ===== RULE 5: Allow VPN Clients to Internal Networks ===== -->
+  <rule uuid="openvpn-to-internal-networks">
+    <type>pass</type>
+    <interface>openvpn</interface>
+    <direction>in</direction>
+    <ipprotocol>inet</ipprotocol>
+    <protocol>all</protocol>
+    <source>
+      <network>10.8.0.0/24</network>
+    </source>
+    <destination>
+      <address>192.168.226.0/24,192.168.20.0/24,192.168.30.0/24</address>
+    </destination>
+    <statetype>keep state</statetype>
+    <log>1</log>
+    <quick>1</quick>
+    <descr>OpenVPN Clients to Internal Networks (10.8.0.0/24)</descr>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+    </created>
+  </rule>
+
+  <!-- ===== RULE 6: Allow Internal Networks to VPN Clients ===== -->
+  <rule uuid="internal-networks-to-openvpn">
+    <type>pass</type>
+    <interface>openvpn</interface>
+    <direction>in</direction>
+    <ipprotocol>inet</ipprotocol>
+    <protocol>all</protocol>
+    <source>
+      <address>192.168.226.0/24,192.168.20.0/24,192.168.30.0/24</address>
+    </source>
+    <destination>
+      <network>10.8.0.0/24</network>
+    </destination>
+    <statetype>keep state</statetype>
+    <log>1</log>
+    <quick>1</quick>
+    <descr>Internal Networks to OpenVPN Clients</descr>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+    </created>
+  </rule>
+
+  <!-- ===== RULE 7: Block Invalid States ===== -->
+  <rule uuid="block-invalid-states">
+    <type>block</type>
+    <interface>wan</interface>
+    <direction>in</direction>
+    <ipprotocol>inet</ipprotocol>
+    <protocol>all</protocol>
+    <source>
+      <any>1</any>
+    </source>
+    <destination>
+      <any>1</any>
+    </destination>
+    <statetype>invalid</statetype>
+    <log>1</log>
+    <quick>1</quick>
+    <floating>yes</floating>
+    <descr>Block Invalid State Packets</descr>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+    </created>
+  </rule>
+
+  <!-- ===== RULE 8: Rate Limiting for OpenVPN Port ===== -->
+  <rule uuid="openvpn-rate-limit">
+    <type>pass</type>
+    <interface>wan</interface>
+    <direction>in</direction>
+    <ipprotocol>inet</ipprotocol>
+    <protocol>udp</protocol>
+    <source>
+      <any>1</any>
+    </source>
+    <destination>
+      <network>wanip</network>
+      <port>1194</port>
+    </destination>
+    <statetype>keep state</statetype>
+    <log>1</log>
+    <quick>1</quick>
+    <max-src-conn>100</max-src-conn>
+    <max-src-conn-rate>10/60</max-src-conn-rate>
+    <max-src-states>1000</max-src-states>
+    <descr>OpenVPN Port Rate Limiting (Anti-DDoS)</descr>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+    </created>
+  </rule>
+
+  <!-- ===== RULE 9: Allow LAN to Any (Existing Default) ===== -->
+  <rule uuid="default-allow-lan-to-any">
+    <type>pass</type>
+    <interface>lan</interface>
+    <ipprotocol>inet</ipprotocol>
+    <source>
+      <network>lan</network>
+    </source>
+    <destination>
+      <any/>
+    </destination>
+    <descr>Default allow LAN to any rule</descr>
+  </rule>
+
+  <!-- ===== RULE 10: Allow LAN IPv6 to Any (Existing Default) ===== -->
+  <rule uuid="default-allow-lan-ipv6-to-any">
+    <type>pass</type>
+    <interface>lan</interface>
+    <ipprotocol>inet6</ipprotocol>
+    <source>
+      <network>lan</network>
+    </source>
+    <destination>
+      <any/>
+    </destination>
+    <descr>Default allow LAN IPv6 to any rule</descr>
+  </rule>
+
+  <!-- ===== METADATA ===== -->
+  <metadata>
+    <version>1.0.0</version>
+    <created>2026-09-03</created>
+    <purpose>OpenVPN maximum security inbound firewall rules</purpose>
+    <security_level>high</security_level>
+    <rule_count>10</rule_count>
+  </metadata>
+</firewall_inbound_rules>

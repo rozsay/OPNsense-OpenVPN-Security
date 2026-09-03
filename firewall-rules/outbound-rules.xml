@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- OPNsense Firewall Outbound Rules - OpenVPN Maximum Security -->
+<firewall_outbound_rules>
+  <rule uuid="openvpn-outbound-clients-10-8">
+    <type>pass</type>
+    <interface>wan</interface>
+    <protocol>all</protocol>
+    <source>
+      <network>10.8.0.0/24</network>
+    </source>
+    <destination>
+      <any>1</any>
+    </destination>
+    <descr>OpenVPN Clients (10.8.0.0/24) Outbound</descr>
+    <statetype>keep state</statetype>
+    <log>1</log>
+  </rule>
+  
+  <rule uuid="internal-to-openvpn-clients">
+    <type>pass</type>
+    <interface>openvpn</interface>
+    <protocol>all</protocol>
+    <source>
+      <address>192.168.226.0/24,192.168.20.0/24,192.168.30.0/24</address>
+    </source>
+    <destination>
+      <network>10.8.0.0/24</network>
+    </destination>
+    <descr>Internal Networks to OpenVPN Clients</descr>
+    <statetype>keep state</statetype>
+  </rule>
+</firewall_outbound_rules>

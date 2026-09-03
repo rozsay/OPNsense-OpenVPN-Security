@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+<!-- OPNsense NAT Rules - OpenVPN Maximum Security -->
+<!-- Version: 1.0.0 | Date: 2026-09-03 -->
+
+<firewall_nat_rules>
+  <!-- ===== NAT RULE 1: OpenVPN Clients to Internal Networks (Outbound) ===== -->
+  <rule uuid="nat-openvpn-outbound-10-8">
+    <protocol>all</protocol>
+    <interface>wan</interface>
+    <ipprotocol>inet</ipprotocol>
+    <source>
+      <network>10.8.0.0/24</network>
+    </source>
+    <destination>
+      <any>1</any>
+    </destination>
+    <target>wanip</target>
+    <targetip_subnet>0</targetip_subnet>
+    <staticnatport>0</staticnatport>
+    <poolopts/>
+    <descr>OpenVPN Clients (10.8.0.0/24) Outbound NAT</descr>
+    <category/>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+      <description>OpenVPN NAT rule for client outbound traffic</description>
+    </created>
+    <updated>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+      <description>OpenVPN NAT rule for client outbound traffic</description>
+    </updated>
+  </rule>
+
+  <!-- ===== NAT RULE 2: Internal Networks to OpenVPN Clients ===== -->
+  <rule uuid="nat-internal-to-openvpn">
+    <protocol>all</protocol>
+    <interface>openvpn</interface>
+    <ipprotocol>inet</ipprotocol>
+    <source>
+      <network>192.168.226.0/24,192.168.20.0/24,192.168.30.0/24</network>
+    </source>
+    <destination>
+      <network>10.8.0.0/24</network>
+    </destination>
+    <target/>
+    <targetip_subnet>0</targetip_subnet>
+    <staticnatport>0</staticnatport>
+    <poolopts/>
+    <descr>Internal Networks to OpenVPN Clients (No NAT Required)</descr>
+    <category/>
+    <disabled>1</disabled>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+    </created>
+  </rule>
+
+  <!-- ===== NAT RULE 3: Port Forwarding for OpenVPN (if needed) ===== -->
+  <rule uuid="nat-port-forward-openvpn">
+    <protocol>udp</protocol>
+    <interface>wan</interface>
+    <ipprotocol>inet</ipprotocol>
+    <source>
+      <any>1</any>
+      <port>1194</port>
+    </source>
+    <destination>
+      <address>wanip</address>
+      <port>1194</port>
+    </destination>
+    <target>192.168.226.31</target>
+    <local-port>1194</local-port>
+    <staticnatport>1</staticnatport>
+    <poolopts/>
+    <associated-rule-id>nat_openvpn_pf_1194</associated-rule-id>
+    <descr>OpenVPN Port Forward (UDP 1194 to Firewall)</descr>
+    <category/>
+    <disabled>1</disabled>
+    <created>
+      <username>root@192.168.226.31</username>
+      <time>1725352772</time>
+    </created>
+  </rule>
+
+  <!-- ===== OUTBOUND NAT MODE ===== -->
+  <outbound>
+    <!-- Outbound NAT Mode: automatic (hybrid) -->
+    <mode>automatic</mode>
+    
+    <!-- ===== OUTBOUND RULE 1: OpenVPN Clients Default Route ===== -->
+    <rule uuid="outbound-openvpn-default">
+      <source>
+        <network>10.8.0.0/24</network>
+      </source>
+      <destination>
+        <any>1</any>
+      </destination>
+      <descr>OpenVPN Clients Default Outbound (Automatic NAT)</descr>
+      <category/>
+      <interface>wan</interface>
+      <tag/>
+      <tagged/>
+      <poolopts/>
+      <poolopts_sourcehashkey/>
+      <ipprotocol>inet</ipprotocol>
+      <target/>
+      <targetip_subnet>0</targetip_subnet>
+      <sourceport/>
+      <created>
+        <username>root@192.168.226.31</username>
+        <time>1725352772</time>
+        <description>Default automatic outbound NAT for OpenVPN clients</description>
+      </created>
+      <updated>
+        <username>root@192.168.226.31</username>
+        <time>1725352772</time>
+      </updated>
+    </rule>
+
+    <!-- ===== OUTBOUND RULE 2: Internal Networks Direct Route ===== -->
+    <rule uuid="outbound-internal-direct">
+      <source>
+        <network>192.168.226.0/24,192.168.20.0/24,192.168.30.0/24</network>
+      </source>
+      <destination>
+        <network>10.8.0.0/24</network>
+      </destination>
+      <descr>Internal Networks to OpenVPN Clients (No NAT)</descr>
+      <category/>
+      <interface>openvpn</interface>
+      <tag/>
+      <tagged/>
+      <poolopts/>
+      <ipprotocol>inet</ipprotocol>
+      <target/>
+      <targetip_subnet>0</targetip_subnet>
+      <sourceport/>
+      <disabled>1</disabled>
+      <created>
+        <username>root@192.168.226.31</username>
+        <time>1725352772</time>
+      </created>
+    </rule>
+
+    <!-- ===== OUTBOUND RULE 3: 1:1 NAT for Specific VPN Client ===== -->
+    <rule uuid="outbound-1to1-nat-openvpn">
+      <source>
+        <network>10.8.0.5/32</network>
+      </source>
+      <destination>
+        <any>1</any>
+      </destination>
+      <descr>1:1 NAT for Specific OpenVPN Client (10.8.0.5)</descr>
+      <category/>
+      <interface>wan</interface>
+      <tag/>
+      <tagged/>
+      <poolopts/>
+      <ipprotocol>inet</ipprotocol>
+      <target/>
+      <targetip_subnet>0</targetip_subnet>
+      <sourceport/>
+      <disabled>1</disabled>
+      <created>
+        <username>root@192.168.226.31</username>
+        <time>1725352772</time>
+      </created>
+    </rule>
+  </outbound>
+
+  <!-- ===== METADATA ===== -->
+  <metadata>
+    <version>1.0.0</version>
+    <created>2026-09-03</created>
+    <purpose>OpenVPN maximum security NAT rules</purpose>
+    <security_level>high</security_level>
+    <nat_mode>automatic</nat_mode>
+    <rules_count>6</rules_count>
+    <notes>
+      - Rule 1: Core NAT for OpenVPN clients exiting to WAN
+      - Rule 2: Disabled by default (no NAT needed for internal traffic)
+      - Rule 3: Optional port forwarding (usually not needed for OpenVPN server on firewall)
+      - Outbound Rules: Handle return traffic and internal routing
+      - All rules include logging for security audit
+    </notes>
+  </metadata>
+</firewall_nat_rules>

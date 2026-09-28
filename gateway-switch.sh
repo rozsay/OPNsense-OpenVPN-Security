@@ -4,13 +4,15 @@ set -euo pipefail
 usage() {
   cat <<'USAGE'
 Usage:
-  ./gateway-switch.sh test [--apply]
-  ./gateway-switch.sh live [--apply]
+  ./gateway-switch.sh test [--apply] [--insecure]
+  ./gateway-switch.sh live [--apply] [--insecure]
+  ./gateway-switch.sh [--apply] [--insecure] test|live
 
 Environment:
   OPN_HOST            OPNsense host/IP for API reload calls
   OPN_KEY             OPNsense API key
   OPN_SECRET          OPNsense API secret
+  OPN_INSECURE        Set to 1 to allow insecure TLS for API calls (default: 0)
   UBUNTU_WAN_IF       Upstream internet interface on 192.168.226.3 (default: pppoe0)
   OPN_UPSTREAM_IP     OPNsense upstream IP (default: 192.168.226.31)
   UBUNTU_TEST_GW      Ubuntu gateway IP (default: 192.168.226.3)
@@ -23,12 +25,35 @@ Notes:
 USAGE
 }
 
-MODE="${1:-}"
+MODE=""
 APPLY=0
-[[ "${2:-}" == "--apply" ]] && APPLY=1
+OPN_INSECURE="${OPN_INSECURE:-0}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    test|live)
+      MODE="$1"
+      ;;
+    --apply)
+      APPLY=1
+      ;;
+    --insecure)
+      OPN_INSECURE=1
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
 
 [[ -n "$MODE" ]] || { usage; exit 1; }
-[[ "$MODE" == "test" || "$MODE" == "live" ]] || { usage; exit 1; }
 
 UBUNTU_WAN_IF="${UBUNTU_WAN_IF:-pppoe0}"
 OPN_UPSTREAM_IP="${OPN_UPSTREAM_IP:-192.168.226.31}"
@@ -36,18 +61,62 @@ UBUNTU_TEST_GW="${UBUNTU_TEST_GW:-192.168.226.3}"
 EXEC_SSH="${EXEC_SSH:-}"
 
 run() {
-  echo "+ $*"
+  printf '+ '
+  printf '%q ' "$@"
+  printf '\n'
   if [[ "$APPLY" -eq 1 ]]; then
-    eval "$*"
+    "$@"
   fi
 }
 
+quote_join() {
+  local out
+  printf -v out '%q ' "$@"
+  printf '%s' "${out% }"
+}
+
 ubuntu_run() {
-  local cmd="$1"
   if [[ -n "$EXEC_SSH" ]]; then
-    run "ssh ${EXEC_SSH@Q} ${cmd@Q}"
+    local remote_cmd
+    remote_cmd="$(quote_join "$@")"
+    run ssh "$EXEC_SSH" "$remote_cmd"
   else
-    run "$cmd"
+    run "$@"
+  fi
+}
+
+ubuntu_ensure_iptables_rule() {
+  local table="$1" chain="$2"
+  shift 2
+  ubuntu_run iptables -t "$table" -C "$chain" "$@"
+  if [[ "$APPLY" -eq 1 ]]; then
+    if [[ -n "$EXEC_SSH" ]]; then
+      local remote_cmd
+      remote_cmd="$(quote_join iptables -t "$table" -C "$chain" "$@")"
+      if ! ssh "$EXEC_SSH" "$remote_cmd" >/dev/null 2>&1; then
+        ubuntu_run iptables -t "$table" -A "$chain" "$@"
+      fi
+    else
+      if ! iptables -t "$table" -C "$chain" "$@" >/dev/null 2>&1; then
+        ubuntu_run iptables -t "$table" -A "$chain" "$@"
+      fi
+    fi
+  fi
+}
+
+ubuntu_delete_iptables_rule() {
+  local table="$1" chain="$2"
+  shift 2
+  if [[ "$APPLY" -eq 1 ]]; then
+    if [[ -n "$EXEC_SSH" ]]; then
+      local remote_cmd
+      remote_cmd="$(quote_join iptables -t "$table" -D "$chain" "$@")"
+      ssh "$EXEC_SSH" "$remote_cmd" >/dev/null 2>&1 || true
+    else
+      iptables -t "$table" -D "$chain" "$@" >/dev/null 2>&1 || true
+    fi
+  else
+    ubuntu_run iptables -t "$table" -D "$chain" "$@"
   fi
 }
 
@@ -56,29 +125,43 @@ opn_apply() {
     echo "! OPNsense API credentials not set; skipping API apply calls"
     return 0
   fi
-  run "curl -sk -u ${OPN_KEY@Q}:${OPN_SECRET@Q} -H 'Content-Type: application/json' -X POST https://${OPN_HOST}/api/firewall/filter/apply"
+  local -a curl_cmd=(curl -sS -u "$OPN_KEY:$OPN_SECRET" -H 'Content-Type: application/json' -X POST "https://${OPN_HOST}/api/firewall/filter/apply")
+  if [[ "$OPN_INSECURE" == "1" ]]; then
+    curl_cmd=(curl -k -sS -u "$OPN_KEY:$OPN_SECRET" -H 'Content-Type: application/json' -X POST "https://${OPN_HOST}/api/firewall/filter/apply")
+  fi
+  run "${curl_cmd[@]}"
 }
 
 add_test_routes() {
   local nets=(192.168.10.0/24 192.168.20.0/24 192.168.30.0/24 192.168.40.0/24 192.168.50.0/24 192.168.60.0/24 10.8.0.0/24 10.10.0.0/24)
+  local net
   for net in "${nets[@]}"; do
-    ubuntu_run "ip route replace ${net} via ${OPN_UPSTREAM_IP}"
+    ubuntu_run ip route replace "$net" via "$OPN_UPSTREAM_IP"
   done
 }
 
 remove_test_routes() {
   local nets=(192.168.10.0/24 192.168.20.0/24 192.168.30.0/24 192.168.40.0/24 192.168.50.0/24 192.168.60.0/24 10.8.0.0/24 10.10.0.0/24)
+  local net
   for net in "${nets[@]}"; do
-    ubuntu_run "ip route del ${net} via ${OPN_UPSTREAM_IP} || true"
+    if [[ "$APPLY" -eq 1 ]]; then
+      if [[ -n "$EXEC_SSH" ]]; then
+        ssh "$EXEC_SSH" "$(quote_join ip route del "$net" via "$OPN_UPSTREAM_IP")" >/dev/null 2>&1 || true
+      else
+        ip route del "$net" via "$OPN_UPSTREAM_IP" >/dev/null 2>&1 || true
+      fi
+    else
+      ubuntu_run ip route del "$net" via "$OPN_UPSTREAM_IP"
+    fi
   done
 }
 
 add_test_openvpn_dnat() {
-  ubuntu_run "iptables -t nat -C PREROUTING -i ${UBUNTU_WAN_IF} -p udp --dport 11194 -j DNAT --to-destination ${OPN_UPSTREAM_IP}:11194 || iptables -t nat -A PREROUTING -i ${UBUNTU_WAN_IF} -p udp --dport 11194 -j DNAT --to-destination ${OPN_UPSTREAM_IP}:11194"
+  ubuntu_ensure_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
 }
 
 remove_test_openvpn_dnat() {
-  ubuntu_run "iptables -t nat -D PREROUTING -i ${UBUNTU_WAN_IF} -p udp --dport 11194 -j DNAT --to-destination ${OPN_UPSTREAM_IP}:11194 || true"
+  ubuntu_delete_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
 }
 
 show_manual_opnsense_steps() {

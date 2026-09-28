@@ -8,6 +8,7 @@
     <alias><name>ALI_NET_VOICE</name><type>network</type><content>192.168.50.0/24</content></alias>
     <alias><name>ALI_NET_IOT</name><type>network</type><content>192.168.60.0/24</content></alias>
     <alias><name>ALI_NET_UPSTREAM</name><type>network</type><content>192.168.226.0/24</content></alias>
+    <alias><name>ALI_NET_RFC1918</name><type>network</type><content>10.0.0.0/8,172.16.0.0/12,192.168.0.0/16</content></alias>
     <alias><name>ALI_HOST_UPSTREAM_UBUNTU_GW</name><type>host</type><content>192.168.226.3</content></alias>
     <alias><name>ALI_NET_VPN</name><type>network</type><content>10.8.0.0/24,10.10.0.0/24</content></alias>
     <alias><name>ALI_NET_VPN_APPROVED</name><type>network</type><content>192.168.20.0/24,192.168.30.0/24,192.168.226.0/24</content></alias>
@@ -58,17 +59,19 @@
       <interface>opt3</interface>
       <action>pass</action>
       <source>ALI_NET_DEV</source>
-      <destination>any</destination>
+      <destination>ALI_NET_RFC1918</destination>
+      <destination_not>1</destination_not>
       <gateway>GW_FAILOVER</gateway>
-      <description>[AI-Gen] Allow Dev internet egress with policy routing - VLAN30 baseline</description>
+      <description>[AI-Gen] Allow Dev internet-only egress with policy routing - VLAN30 baseline</description>
     </rule>
     <rule>
       <interface>opt4</interface>
       <action>pass</action>
       <source>ALI_NET_OFFICE</source>
-      <destination>any</destination>
+      <destination>ALI_NET_RFC1918</destination>
+      <destination_not>1</destination_not>
       <gateway>GW_FAILOVER</gateway>
-      <description>[AI-Gen] Allow Office full internet access - VLAN40 baseline</description>
+      <description>[AI-Gen] Allow Office internet-only egress with policy routing - VLAN40 baseline</description>
     </rule>
     <rule>
       <interface>opt5</interface>

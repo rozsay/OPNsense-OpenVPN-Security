@@ -218,14 +218,12 @@ add_test_openvpn_dnat() {
 }
 
 remove_test_openvpn_dnat() {
-  if [[ -n "$OPENVPN_ALLOWED_SRC" ]]; then
-    ubuntu_delete_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
-    ubuntu_delete_iptables_rule filter FORWARD -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j ACCEPT
-  else
-    echo "! OPENVPN_ALLOWED_SRC not set; deleting broad UDP/11194 DNAT/FORWARD helpers for ${OPN_UPSTREAM_IP}"
-    ubuntu_delete_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
-    ubuntu_delete_iptables_rule filter FORWARD -i "$UBUNTU_WAN_IF" -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j ACCEPT
+  if [[ -z "$OPENVPN_ALLOWED_SRC" ]]; then
+    echo "OPENVPN_ALLOWED_SRC must be set to remove only the TEST-mode UDP/11194 rules created by this helper" >&2
+    exit 1
   fi
+  ubuntu_delete_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
+  ubuntu_delete_iptables_rule filter FORWARD -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j ACCEPT
 }
 
 show_manual_opnsense_steps() {

@@ -2,8 +2,8 @@
 <opnsense-security-hardening>
   <metadata>
     <source>/home/runner/work/OPNsense-OpenVPN-Security/OPNsense-OpenVPN-Security/empty.xml</source>
-    <purpose>Recommended hardening deltas for the analyzed OPNsense configuration</purpose>
-    <warning>Review on a backup copy of /conf/config.xml before applying via GUI or API.</warning>
+    <purpose>Recommended hardening guidance for the analyzed OPNsense configuration</purpose>
+    <warning>This file is documentation-oriented guidance, not a drop-in import fragment. Review on a backup copy of /conf/config.xml before applying equivalent changes via GUI or API.</warning>
     <placeholder>Populate LDAP bind DN and secrets via local secure configuration management, not from this artifact.</placeholder>
   </metadata>
   <system>

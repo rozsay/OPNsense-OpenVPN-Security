@@ -20,8 +20,9 @@ Environment:
 
 Notes:
   - Default mode is DRY-RUN. Use --apply to execute.
-  - This script changes only the reversible TEST/LIVE orchestration points it can do safely.
-  - Persistent OPNsense config edits should still be reviewed and applied via GUI/API as documented.
+  - This script changes only the reversible Ubuntu-side TEST/LIVE orchestration points it can do safely.
+  - On OPNsense it only triggers firewall filter apply when API credentials are provided.
+  - Persistent OPNsense gateway, interface, and OpenVPN config edits should still be reviewed and applied via GUI/API as documented.
 USAGE
 }
 
@@ -122,9 +123,9 @@ ubuntu_delete_iptables_rule() {
   fi
 }
 
-opn_apply() {
+opn_firewall_apply() {
   if [[ -z "${OPN_HOST:-}" || -z "${OPN_KEY:-}" || -z "${OPN_SECRET:-}" ]]; then
-    echo "! OPNsense API credentials not set; skipping API apply calls"
+    echo "! OPNsense API credentials not set; skipping optional firewall apply call"
     return 0
   fi
   local -a curl_cmd=(curl -sS -u "$OPN_KEY:$OPN_SECRET" -H 'Content-Type: application/json' -X POST "https://${OPN_HOST}/api/firewall/filter/apply")
@@ -176,6 +177,8 @@ Manual OPNsense checkpoints for TEST mode:
 - OpenVPN local bind should be blank or ${OPN_UPSTREAM_IP}
 - OpenVPN push routes should include 192.168.10.0/24 if MGMT access is required
 - Re-apply firewall/filter after changes
+- Reconfigure gateway/interface/OpenVPN services manually after persistent OPNsense-side changes
+- Reconfigure gateway/interface/OpenVPN services manually after persistent OPNsense-side changes
 EOF2
   else
     cat <<EOF2
@@ -186,6 +189,7 @@ Manual OPNsense checkpoints for LIVE mode:
 - Remove dependency on Ubuntu DNAT for UDP/11194
 - Review outbound NAT for WAN/PPPoE
 - Re-apply firewall/filter after changes
+- Reconfigure gateway/interface/OpenVPN services manually after persistent OPNsense-side changes
 EOF2
   fi
 }
@@ -194,13 +198,13 @@ if [[ "$MODE" == "test" ]]; then
   echo "Switching toward TEST mode"
   add_test_routes
   add_test_openvpn_dnat
-  opn_apply
+  opn_firewall_apply
   show_manual_opnsense_steps
 else
   echo "Switching toward LIVE mode"
   remove_test_openvpn_dnat
   remove_test_routes
-  opn_apply
+  opn_firewall_apply
   show_manual_opnsense_steps
 fi
 

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<firewall-rules-per-vlan>
+  <aliases>
+    <alias><name>ALI_NET_MGMT</name><type>network</type><content>192.168.10.0/24</content></alias>
+    <alias><name>ALI_NET_SERVER</name><type>network</type><content>192.168.20.0/24</content></alias>
+    <alias><name>ALI_NET_DEV</name><type>network</type><content>192.168.30.0/24</content></alias>
+    <alias><name>ALI_NET_OFFICE</name><type>network</type><content>192.168.40.0/24</content></alias>
+    <alias><name>ALI_NET_VOICE</name><type>network</type><content>192.168.50.0/24</content></alias>
+    <alias><name>ALI_NET_IOT</name><type>network</type><content>192.168.60.0/24</content></alias>
+    <alias><name>ALI_NET_UPSTREAM</name><type>network</type><content>192.168.226.0/24</content></alias>
+    <alias><name>ALI_NET_VPN</name><type>network</type><content>10.8.0.0/24,10.10.0.0/24</content></alias>
+    <alias><name>ALI_PORT_DNS</name><type>port</type><content>53</content></alias>
+    <alias><name>ALI_PORT_NTP</name><type>port</type><content>123</content></alias>
+    <alias><name>ALI_PORT_SIP</name><type>port</type><content>5060,5061</content></alias>
+    <alias><name>ALI_PORT_MGMT</name><type>port</type><content>22,443,8443,19992</content></alias>
+  </aliases>
+  <rules>
+    <rule>
+      <interface>opt1</interface>
+      <action>pass</action>
+      <source>ALI_NET_MGMT</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_MGMT</destination_port>
+      <description>[AI-Gen] Allow MGMT admin access to firewall - VLAN10 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt1</interface>
+      <action>pass</action>
+      <source>ALI_NET_MGMT</source>
+      <destination>any</destination>
+      <description>[AI-Gen] Allow MGMT controlled internal administration - VLAN10 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt2</interface>
+      <action>pass</action>
+      <source>ALI_NET_SERVER</source>
+      <destination>ALI_NET_UPSTREAM</destination>
+      <description>[AI-Gen] Allow Server subnet to upstream services only - VLAN20 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt3</interface>
+      <action>pass</action>
+      <source>ALI_NET_DEV</source>
+      <destination>any</destination>
+      <gateway>GW_FAILOVER_OR_PPPOE_MODE</gateway>
+      <description>[AI-Gen] Allow Dev internet egress with policy routing - VLAN30 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt3</interface>
+      <action>block</action>
+      <source>ALI_NET_DEV</source>
+      <destination>ALI_NET_MGMT</destination>
+      <description>[AI-Gen] Block Dev direct access to MGMT - Segmentation baseline</description>
+    </rule>
+    <rule>
+      <interface>opt4</interface>
+      <action>pass</action>
+      <source>ALI_NET_OFFICE</source>
+      <destination>any</destination>
+      <gateway>GW_FAILOVER_OR_PPPOE_MODE</gateway>
+      <description>[AI-Gen] Allow Office full internet access - VLAN40 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt5</interface>
+      <action>pass</action>
+      <protocol>udp</protocol>
+      <source>ALI_NET_VOICE</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_DNS,ALI_PORT_NTP</destination_port>
+      <description>[AI-Gen] Allow Voice DNS/NTP to firewall - VLAN50 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt5</interface>
+      <action>pass</action>
+      <source>ALI_NET_VOICE</source>
+      <destination>ALI_NET_UPSTREAM</destination>
+      <destination_port>ALI_PORT_SIP</destination_port>
+      <description>[AI-Gen] Allow Voice SIP to upstream PBX/gateway - VLAN50 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt5</interface>
+      <action>block</action>
+      <source>ALI_NET_VOICE</source>
+      <destination>ALI_NET_MGMT,ALI_NET_SERVER,ALI_NET_DEV,ALI_NET_IOT</destination>
+      <description>[AI-Gen] Block unnecessary Voice lateral access - Segmentation baseline</description>
+    </rule>
+    <rule>
+      <interface>opt6</interface>
+      <action>pass</action>
+      <source>ALI_NET_IOT</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_DNS,ALI_PORT_NTP</destination_port>
+      <description>[AI-Gen] Allow IoT DNS/NTP only - VLAN60 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt6</interface>
+      <action>block</action>
+      <source>ALI_NET_IOT</source>
+      <destination>ALI_NET_MGMT,ALI_NET_SERVER,ALI_NET_DEV,ALI_NET_OFFICE</destination>
+      <description>[AI-Gen] Block IoT lateral movement - Segmentation baseline</description>
+    </rule>
+    <rule>
+      <interface>opt7</interface>
+      <action>pass</action>
+      <protocol>udp</protocol>
+      <source>192.168.226.3/32</source>
+      <destination>thisfirewall</destination>
+      <destination_port>11194</destination_port>
+      <description>[AI-Gen] Allow upstream OpenVPN handoff from Ubuntu gateway - Port forward fix</description>
+    </rule>
+    <rule>
+      <interface>openvpn</interface>
+      <action>pass</action>
+      <source>ALI_NET_VPN</source>
+      <destination>ALI_NET_DEV,ALI_NET_SERVER,ALI_NET_UPSTREAM</destination>
+      <description>[AI-Gen] Allow VPN access to approved internal networks - VPN baseline</description>
+    </rule>
+    <rule>
+      <interface>openvpn</interface>
+      <action>pass</action>
+      <source>ALI_NET_VPN</source>
+      <destination>ALI_NET_MGMT</destination>
+      <destination_port>ALI_PORT_MGMT</destination_port>
+      <description>[AI-Gen] Allow VPN admin access to MGMT only - VPN management access</description>
+    </rule>
+  </rules>
+</firewall-rules-per-vlan>

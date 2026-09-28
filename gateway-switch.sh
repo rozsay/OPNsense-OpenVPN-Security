@@ -193,14 +193,12 @@ add_test_openvpn_dnat() {
   require_openvpn_allowed_src
   ubuntu_ensure_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
   ubuntu_ensure_iptables_rule filter FORWARD -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j ACCEPT
-  ubuntu_ensure_iptables_rule nat POSTROUTING -s "$OPENVPN_ALLOWED_SRC" -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j MASQUERADE
 }
 
 remove_test_openvpn_dnat() {
   require_openvpn_allowed_src
   ubuntu_delete_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
   ubuntu_delete_iptables_rule filter FORWARD -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j ACCEPT
-  ubuntu_delete_iptables_rule nat POSTROUTING -s "$OPENVPN_ALLOWED_SRC" -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j MASQUERADE
 }
 
 show_manual_opnsense_steps() {

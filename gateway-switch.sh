@@ -70,6 +70,7 @@ UBUNTU_TEST_GW="${UBUNTU_TEST_GW:-192.168.226.3}"
 EXEC_SSH="${EXEC_SSH:-}"
 OPENVPN_ALLOWED_SRC="${OPENVPN_ALLOWED_SRC:-}"
 CONFIRM_RETURN_PATH_VIA_UBUNTU="${CONFIRM_RETURN_PATH_VIA_UBUNTU:-0}"
+ROUTED_NETS=(192.168.10.0/24 192.168.20.0/24 192.168.30.0/24 192.168.40.0/24 192.168.50.0/24 192.168.60.0/24 10.8.0.0/24 10.10.0.0/24)
 
 run() {
   printf '+ '
@@ -83,8 +84,7 @@ run() {
 preview_conditional_add() {
   printf '+ if missing: '
   printf '%q ' "$@"
-  printf '
-'
+  printf '\n'
 }
 
 quote_join() {
@@ -159,11 +159,25 @@ opn_api_post() {
     return 0
   fi
 
-  local -a curl_cmd=(curl -sS -u "$OPN_KEY:$OPN_SECRET" -H 'Content-Type: application/json' -X POST "https://${OPN_HOST}${path}")
-  if [[ "$OPN_INSECURE" == "1" ]]; then
-    curl_cmd=(curl -k -sS -u "$OPN_KEY:$OPN_SECRET" -H 'Content-Type: application/json' -X POST "https://${OPN_HOST}${path}")
+  local curl_url="https://${OPN_HOST}${path}"
+  local curl_cfg
+  curl_cfg=$(cat <<CFG
+user = "${OPN_KEY}:${OPN_SECRET}"
+header = "Content-Type: application/json"
+request = "POST"
+url = "${curl_url}"
+CFG
+)
+
+  if [[ "$APPLY" -eq 1 ]]; then
+    if [[ "$OPN_INSECURE" == "1" ]]; then
+      printf '%s\n' "$curl_cfg" | curl -k -sS --config -
+    else
+      printf '%s\n' "$curl_cfg" | curl -sS --config -
+    fi
+  else
+    echo "+ curl --config - ${curl_url}"
   fi
-  run "${curl_cmd[@]}"
 }
 
 opn_apply_steps() {
@@ -177,26 +191,22 @@ opn_apply_steps() {
   fi
 }
 
-add_test_routes() {
-  local nets=(192.168.10.0/24 192.168.20.0/24 192.168.30.0/24 192.168.40.0/24 192.168.50.0/24 192.168.60.0/24 10.8.0.0/24 10.10.0.0/24)
+apply_routes() {
+  local action="$1"
   local net
-  for net in "${nets[@]}"; do
-    ubuntu_run ip route replace "$net" via "$OPN_UPSTREAM_IP"
-  done
-}
-
-remove_test_routes() {
-  local nets=(192.168.10.0/24 192.168.20.0/24 192.168.30.0/24 192.168.40.0/24 192.168.50.0/24 192.168.60.0/24 10.8.0.0/24 10.10.0.0/24)
-  local net
-  for net in "${nets[@]}"; do
-    if [[ "$APPLY" -eq 1 ]]; then
-      if [[ -n "$EXEC_SSH" ]]; then
-        ssh "$EXEC_SSH" "$(quote_join ip route del "$net" via "$OPN_UPSTREAM_IP")" >/dev/null 2>&1 || true
-      else
-        ip route del "$net" via "$OPN_UPSTREAM_IP" >/dev/null 2>&1 || true
-      fi
+  for net in "${ROUTED_NETS[@]}"; do
+    if [[ "$action" == "add" ]]; then
+      ubuntu_run ip route replace "$net" via "$OPN_UPSTREAM_IP"
     else
-      ubuntu_run ip route del "$net" via "$OPN_UPSTREAM_IP"
+      if [[ "$APPLY" -eq 1 ]]; then
+        if [[ -n "$EXEC_SSH" ]]; then
+          ssh "$EXEC_SSH" "$(quote_join ip route del "$net" via "$OPN_UPSTREAM_IP")" >/dev/null 2>&1 || true
+        else
+          ip route del "$net" via "$OPN_UPSTREAM_IP" >/dev/null 2>&1 || true
+        fi
+      else
+        ubuntu_run ip route del "$net" via "$OPN_UPSTREAM_IP"
+      fi
     fi
   done
 }
@@ -223,7 +233,6 @@ Manual OPNsense checkpoints for TEST mode:
 - OpenVPN local bind should be blank or ${OPN_UPSTREAM_IP}
 - OPENVPN_ALLOWED_SRC should be set to the remote client CIDR(s) permitted in TEST mode
 - CONFIRM_RETURN_PATH_VIA_UBUNTU=1 should only be set when OPNsense replies are known to return via 192.168.226.3 in TEST mode
-- OpenVPN push routes should include 192.168.10.0/24 if MGMT access is required
 - Re-apply firewall/filter after changes
 - Reconfigure gateway/interface/OpenVPN services manually after persistent OPNsense-side changes
 EOF2
@@ -243,14 +252,14 @@ EOF2
 
 if [[ "$MODE" == "test" ]]; then
   echo "Switching toward TEST mode"
-  add_test_routes
+  apply_routes add
   add_test_openvpn_dnat
   opn_apply_steps
   show_manual_opnsense_steps
 else
   echo "Switching toward LIVE mode"
   remove_test_openvpn_dnat
-  remove_test_routes
+  apply_routes del
   opn_apply_steps
   show_manual_opnsense_steps
 fi

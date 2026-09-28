@@ -57,8 +57,9 @@
       <proto>udp4</proto>
       <port>11194</port>
       <local>192.168.226.31</local>
+      <warning>Push the MGMT route only when a separate admin-scoped VPN firewall policy exists for 192.168.10.0/24.</warning>
       <push_route>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.40.0/24,192.168.226.0/24</push_route>
-      <description>[AI-Gen] Bind OpenVPN to upstream-facing address and push MGMT route - OpenVPN reachability</description>
+      <description>[AI-Gen] Bind OpenVPN to upstream-facing address and push MGMT route only for admin-scoped access - OpenVPN reachability</description>
     </server>
   </openvpn>
   <aliases>

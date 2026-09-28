@@ -88,7 +88,6 @@ ubuntu_run() {
 ubuntu_ensure_iptables_rule() {
   local table="$1" chain="$2"
   shift 2
-  ubuntu_run iptables -t "$table" -C "$chain" "$@"
   if [[ "$APPLY" -eq 1 ]]; then
     if [[ -n "$EXEC_SSH" ]]; then
       local remote_cmd
@@ -101,6 +100,9 @@ ubuntu_ensure_iptables_rule() {
         ubuntu_run iptables -t "$table" -A "$chain" "$@"
       fi
     fi
+  else
+    ubuntu_run iptables -t "$table" -C "$chain" "$@"
+    ubuntu_run iptables -t "$table" -A "$chain" "$@"
   fi
 }
 

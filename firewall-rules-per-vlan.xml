@@ -10,11 +10,12 @@
     <alias><name>ALI_NET_UPSTREAM</name><type>network</type><content>192.168.226.0/24</content></alias>
     <alias><name>ALI_NET_VPN</name><type>network</type><content>10.8.0.0/24,10.10.0.0/24</content></alias>
     <alias><name>ALI_NET_VPN_APPROVED</name><type>network</type><content>192.168.20.0/24,192.168.30.0/24,192.168.226.0/24</content></alias>
+    <alias><name>ALI_HOST_VPN_MGMT_ADMINS</name><type>host</type><content>10.8.0.10,10.8.0.11</content></alias>
+    <alias><name>ALI_NET_MGMT_APPROVED</name><type>network</type><content>192.168.20.0/24,192.168.30.0/24,192.168.226.0/24</content></alias>
     <alias><name>ALI_NET_BLOCKED_FROM_VOICE</name><type>network</type><content>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.60.0/24</content></alias>
     <alias><name>ALI_NET_BLOCKED_FROM_IOT</name><type>network</type><content>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.40.0/24</content></alias>
     <alias><name>ALI_PORT_DNS</name><type>port</type><content>53</content></alias>
     <alias><name>ALI_PORT_NTP</name><type>port</type><content>123</content></alias>
-    <alias><name>ALI_PORT_DNS_NTP</name><type>port</type><content>53,123</content></alias>
     <alias><name>ALI_PORT_SIP</name><type>port</type><content>5060,5061</content></alias>
     <alias><name>ALI_PORT_MGMT</name><type>port</type><content>22,443,8443,19992</content></alias>
   </aliases>
@@ -32,8 +33,8 @@
       <interface>opt1</interface>
       <action>pass</action>
       <source>ALI_NET_MGMT</source>
-      <destination>any</destination>
-      <description>[AI-Gen] Allow MGMT controlled internal administration - VLAN10 baseline</description>
+      <destination>ALI_NET_MGMT_APPROVED</destination>
+      <description>[AI-Gen] Allow MGMT to approved internal admin networks only - VLAN10 baseline</description>
     </rule>
     <rule>
       <interface>opt2</interface>
@@ -71,8 +72,17 @@
       <protocol>udp</protocol>
       <source>ALI_NET_VOICE</source>
       <destination>thisfirewall</destination>
-      <destination_port>ALI_PORT_DNS_NTP</destination_port>
-      <description>[AI-Gen] Allow Voice DNS/NTP to firewall - VLAN50 baseline</description>
+      <destination_port>ALI_PORT_DNS</destination_port>
+      <description>[AI-Gen] Allow Voice DNS to firewall - VLAN50 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt5</interface>
+      <action>pass</action>
+      <protocol>udp</protocol>
+      <source>ALI_NET_VOICE</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_NTP</destination_port>
+      <description>[AI-Gen] Allow Voice NTP to firewall - VLAN50 baseline</description>
     </rule>
     <rule>
       <interface>opt5</interface>
@@ -94,8 +104,17 @@
       <action>pass</action>
       <source>ALI_NET_IOT</source>
       <destination>thisfirewall</destination>
-      <destination_port>ALI_PORT_DNS_NTP</destination_port>
-      <description>[AI-Gen] Allow IoT DNS/NTP only - VLAN60 baseline</description>
+      <destination_port>ALI_PORT_DNS</destination_port>
+      <description>[AI-Gen] Allow IoT DNS only - VLAN60 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt6</interface>
+      <action>pass</action>
+      <protocol>udp</protocol>
+      <source>ALI_NET_IOT</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_NTP</destination_port>
+      <description>[AI-Gen] Allow IoT NTP only - VLAN60 baseline</description>
     </rule>
     <rule>
       <interface>opt6</interface>
@@ -124,7 +143,7 @@
       <interface>openvpn</interface>
       <action>pass</action>
       <protocol>tcp</protocol>
-      <source>ALI_NET_VPN</source>
+      <source>ALI_HOST_VPN_MGMT_ADMINS</source>
       <destination>ALI_NET_MGMT</destination>
       <destination_port>ALI_PORT_MGMT</destination_port>
       <description>[AI-Gen] Allow VPN admin access to MGMT only - VPN management access</description>

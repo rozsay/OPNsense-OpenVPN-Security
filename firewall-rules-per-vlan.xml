@@ -17,6 +17,7 @@
     <alias><name>ALI_PORT_DNS</name><type>port</type><content>53</content></alias>
     <alias><name>ALI_PORT_NTP</name><type>port</type><content>123</content></alias>
     <alias><name>ALI_PORT_SIP</name><type>port</type><content>5060,5061</content></alias>
+    <alias><name>ALI_PORT_RTP</name><type>port</type><content>10000:20000</content></alias>
     <alias><name>ALI_PORT_MGMT</name><type>port</type><content>22,443,8443,19992</content></alias>
   </aliases>
   <rules>
@@ -69,7 +70,7 @@
     <rule>
       <interface>opt5</interface>
       <action>pass</action>
-      <protocol>udp</protocol>
+      <protocol>tcp/udp</protocol>
       <source>ALI_NET_VOICE</source>
       <destination>thisfirewall</destination>
       <destination_port>ALI_PORT_DNS</destination_port>
@@ -92,6 +93,15 @@
       <destination>ALI_NET_UPSTREAM</destination>
       <destination_port>ALI_PORT_SIP</destination_port>
       <description>[AI-Gen] Allow Voice SIP to upstream PBX/gateway - VLAN50 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt5</interface>
+      <action>pass</action>
+      <protocol>udp</protocol>
+      <source>ALI_NET_VOICE</source>
+      <destination>ALI_NET_UPSTREAM</destination>
+      <destination_port>ALI_PORT_RTP</destination_port>
+      <description>[AI-Gen] Allow Voice RTP media to upstream PBX/gateway - VLAN50 baseline</description>
     </rule>
     <rule>
       <interface>opt5</interface>

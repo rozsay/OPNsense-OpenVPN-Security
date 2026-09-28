@@ -37,11 +37,7 @@ Példa iptables:
 iptables -t nat -A PREROUTING -i pppoe0 -p udp --dport 11194 -j DNAT --to-destination 192.168.226.31:11194
 ```
 
-Ha SNAT/MASQUERADE kell a visszaúthoz:
-
-```bash
-iptables -t nat -A POSTROUTING -p udp -d 192.168.226.31 --dport 11194 -j MASQUERADE
-```
+A preferált megoldás **nem** a SNAT, hanem az, hogy teszt módban az OPNsense visszaútja a `192.168.226.3` Ubuntu gateway felé mutasson, így a valódi kliens-IP megmarad a naplókban és a tűzfalszabályokban is.
 
 ## 2. OPNsense upstream firewall ellenőrzés
 

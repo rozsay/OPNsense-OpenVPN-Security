@@ -4,6 +4,7 @@
     <source>/home/runner/work/OPNsense-OpenVPN-Security/OPNsense-OpenVPN-Security/empty.xml</source>
     <purpose>Recommended hardening deltas for the analyzed OPNsense configuration</purpose>
     <warning>Review on a backup copy of /conf/config.xml before applying via GUI or API.</warning>
+    <placeholder>Populate LDAP bind DN and secrets via local secure configuration management, not from this artifact.</placeholder>
   </metadata>
   <system>
     <webgui>
@@ -32,8 +33,8 @@
       <note>[AI-Gen] Disable direct root administration - Least privilege</note>
     </local_root>
     <ldap>
-      <bind_user>REPLACE_WITH_READ_ONLY_LDAP_BIND_DN</bind_user>
-      <transport>StartTLS-or-LDAPS-with-CA-validation</transport>
+      <bind_user />
+      <transport>StartTLS</transport>
       <rotate_secret>1</rotate_secret>
       <create_local_users>0</create_local_users>
       <note>[AI-Gen] Replace privileged LDAP bind and rotate leaked secret - LDAP hardening</note>

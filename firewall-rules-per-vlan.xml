@@ -55,7 +55,7 @@
       <action>pass</action>
       <source>ALI_NET_DEV</source>
       <destination>any</destination>
-      <gateway>GW_FAILOVER_OR_PPPOE_MODE</gateway>
+      <gateway>GW_FAILOVER</gateway>
       <description>[AI-Gen] Allow Dev internet egress with policy routing - VLAN30 baseline</description>
     </rule>
     <rule>
@@ -63,7 +63,7 @@
       <action>pass</action>
       <source>ALI_NET_OFFICE</source>
       <destination>any</destination>
-      <gateway>GW_FAILOVER_OR_PPPOE_MODE</gateway>
+      <gateway>GW_FAILOVER</gateway>
       <description>[AI-Gen] Allow Office full internet access - VLAN40 baseline</description>
     </rule>
     <rule>
@@ -87,7 +87,7 @@
     <rule>
       <interface>opt5</interface>
       <action>pass</action>
-      <protocol>TCP/UDP</protocol>
+      <protocol>tcp/udp</protocol>
       <source>ALI_NET_VOICE</source>
       <destination>ALI_NET_UPSTREAM</destination>
       <destination_port>ALI_PORT_SIP</destination_port>
@@ -103,7 +103,7 @@
     <rule>
       <interface>opt6</interface>
       <action>pass</action>
-      <protocol>TCP/UDP</protocol>
+      <protocol>tcp/udp</protocol>
       <source>ALI_NET_IOT</source>
       <destination>thisfirewall</destination>
       <destination_port>ALI_PORT_DNS</destination_port>

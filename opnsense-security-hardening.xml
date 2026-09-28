@@ -57,9 +57,9 @@
       <proto>udp4</proto>
       <port>11194</port>
       <local />
-      <warning>Push the MGMT route only when a separate admin-scoped VPN firewall policy exists for 192.168.10.0/24.</warning>
-      <push_route>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.40.0/24,192.168.226.0/24</push_route>
-      <description>[AI-Gen] Leave OpenVPN bind unset for dual-mode operation and push MGMT route only for admin-scoped access - OpenVPN reachability</description>
+      <warning>Add 192.168.10.0/24 as a separate admin-only push route only when an admin-scoped VPN firewall policy exists for MGMT.</warning>
+      <push_route>192.168.20.0/24,192.168.30.0/24,192.168.40.0/24,192.168.226.0/24</push_route>
+      <description>[AI-Gen] Leave OpenVPN bind unset for dual-mode operation and keep MGMT route push separate from the baseline server policy - OpenVPN reachability</description>
     </server>
   </openvpn>
   <aliases>

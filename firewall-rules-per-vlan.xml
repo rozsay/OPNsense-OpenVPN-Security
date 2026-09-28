@@ -87,6 +87,7 @@
     <rule>
       <interface>opt5</interface>
       <action>pass</action>
+      <protocol>TCP/UDP</protocol>
       <source>ALI_NET_VOICE</source>
       <destination>ALI_NET_UPSTREAM</destination>
       <destination_port>ALI_PORT_SIP</destination_port>
@@ -102,6 +103,7 @@
     <rule>
       <interface>opt6</interface>
       <action>pass</action>
+      <protocol>TCP/UDP</protocol>
       <source>ALI_NET_IOT</source>
       <destination>thisfirewall</destination>
       <destination_port>ALI_PORT_DNS</destination_port>

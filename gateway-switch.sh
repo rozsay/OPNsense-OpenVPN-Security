@@ -178,7 +178,6 @@ Manual OPNsense checkpoints for TEST mode:
 - OpenVPN push routes should include 192.168.10.0/24 if MGMT access is required
 - Re-apply firewall/filter after changes
 - Reconfigure gateway/interface/OpenVPN services manually after persistent OPNsense-side changes
-- Reconfigure gateway/interface/OpenVPN services manually after persistent OPNsense-side changes
 EOF2
   else
     cat <<EOF2

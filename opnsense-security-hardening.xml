@@ -32,7 +32,7 @@
       <note>[AI-Gen] Disable direct root administration - Least privilege</note>
     </local_root>
     <ldap>
-      <bind_user>cn=svc-opnsense-ro,dc=topsoft,dc=hu</bind_user>
+      <bind_user>REPLACE_WITH_READ_ONLY_LDAP_BIND_DN</bind_user>
       <transport>StartTLS-or-LDAPS-with-CA-validation</transport>
       <rotate_secret>1</rotate_secret>
       <create_local_users>0</create_local_users>

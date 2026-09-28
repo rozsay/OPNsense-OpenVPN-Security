@@ -10,8 +10,8 @@
     <alias><name>ALI_NET_UPSTREAM</name><type>network</type><content>192.168.226.0/24</content></alias>
     <alias><name>ALI_NET_VPN</name><type>network</type><content>10.8.0.0/24,10.10.0.0/24</content></alias>
     <alias><name>ALI_NET_VPN_APPROVED</name><type>network</type><content>192.168.20.0/24,192.168.30.0/24,192.168.226.0/24</content></alias>
-    <alias><name>ALI_HOST_VPN_INTERNAL_APPROVED</name><type>host</type><content>10.8.0.20,10.8.0.21</content></alias>
-    <alias><name>ALI_HOST_VPN_MGMT_ADMINS</name><type>host</type><content>10.8.0.10,10.8.0.11</content></alias>
+    <alias><name>ALI_NET_VPN_INTERNAL_APPROVED</name><type>network</type><content>10.8.0.128/25</content></alias>
+    <alias><name>ALI_NET_VPN_MGMT_ADMINS</name><type>network</type><content>10.8.0.240/28</content></alias>
     <alias><name>ALI_NET_MGMT_APPROVED</name><type>network</type><content>192.168.20.0/24,192.168.30.0/24,192.168.226.0/24</content></alias>
     <alias><name>ALI_NET_BLOCKED_FROM_VOICE</name><type>network</type><content>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.40.0/24,192.168.60.0/24</content></alias>
     <alias><name>ALI_NET_BLOCKED_FROM_IOT</name><type>network</type><content>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.40.0/24</content></alias>
@@ -148,18 +148,18 @@
     <rule>
       <interface>openvpn</interface>
       <action>pass</action>
-      <source>ALI_HOST_VPN_INTERNAL_APPROVED</source>
+      <source>ALI_NET_VPN_INTERNAL_APPROVED</source>
       <destination>ALI_NET_VPN_APPROVED</destination>
-      <description>[AI-Gen] Allow VPN access to approved internal networks - VPN baseline</description>
+      <description>[AI-Gen] Allow approved VPN role subnet to internal networks - VPN baseline</description>
     </rule>
     <rule>
       <interface>openvpn</interface>
       <action>pass</action>
       <protocol>tcp</protocol>
-      <source>ALI_HOST_VPN_MGMT_ADMINS</source>
+      <source>ALI_NET_VPN_MGMT_ADMINS</source>
       <destination>ALI_NET_MGMT</destination>
       <destination_port>ALI_PORT_MGMT</destination_port>
-      <description>[AI-Gen] Allow VPN admin access to MGMT only - VPN management access</description>
+      <description>[AI-Gen] Allow admin VPN role subnet to MGMT only - VPN management access</description>
     </rule>
   </rules>
 </firewall-rules-per-vlan>

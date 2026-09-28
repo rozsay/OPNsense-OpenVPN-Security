@@ -10,9 +10,10 @@
     <alias><name>ALI_NET_UPSTREAM</name><type>network</type><content>192.168.226.0/24</content></alias>
     <alias><name>ALI_NET_VPN</name><type>network</type><content>10.8.0.0/24,10.10.0.0/24</content></alias>
     <alias><name>ALI_NET_VPN_APPROVED</name><type>network</type><content>192.168.20.0/24,192.168.30.0/24,192.168.226.0/24</content></alias>
+    <alias><name>ALI_HOST_VPN_INTERNAL_APPROVED</name><type>host</type><content>10.8.0.20,10.8.0.21</content></alias>
     <alias><name>ALI_HOST_VPN_MGMT_ADMINS</name><type>host</type><content>10.8.0.10,10.8.0.11</content></alias>
     <alias><name>ALI_NET_MGMT_APPROVED</name><type>network</type><content>192.168.20.0/24,192.168.30.0/24,192.168.226.0/24</content></alias>
-    <alias><name>ALI_NET_BLOCKED_FROM_VOICE</name><type>network</type><content>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.60.0/24</content></alias>
+    <alias><name>ALI_NET_BLOCKED_FROM_VOICE</name><type>network</type><content>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.40.0/24,192.168.60.0/24</content></alias>
     <alias><name>ALI_NET_BLOCKED_FROM_IOT</name><type>network</type><content>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.40.0/24</content></alias>
     <alias><name>ALI_PORT_DNS</name><type>port</type><content>53</content></alias>
     <alias><name>ALI_PORT_NTP</name><type>port</type><content>123</content></alias>
@@ -147,7 +148,7 @@
     <rule>
       <interface>openvpn</interface>
       <action>pass</action>
-      <source>ALI_NET_VPN</source>
+      <source>ALI_HOST_VPN_INTERNAL_APPROVED</source>
       <destination>ALI_NET_VPN_APPROVED</destination>
       <description>[AI-Gen] Allow VPN access to approved internal networks - VPN baseline</description>
     </rule>

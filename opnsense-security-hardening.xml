@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opnsense-security-hardening>
+  <metadata>
+    <source>/home/runner/work/OPNsense-OpenVPN-Security/OPNsense-OpenVPN-Security/empty.xml</source>
+    <purpose>Recommended hardening guidance for the analyzed OPNsense configuration</purpose>
+    <warning>This file is documentation-oriented guidance, not a drop-in import fragment. Review on a backup copy of /conf/config.xml before applying equivalent changes via GUI or API.</warning>
+    <placeholder>Populate LDAP bind DN and secrets via local secure configuration management, not from this artifact.</placeholder>
+  </metadata>
+  <system>
+    <webgui>
+      <interfaces>opt1,openvpn</interfaces>
+      <authmode>Local Database</authmode>
+      <note>[AI-Gen] Restrict WebGUI to MGMT and approved VPN access - Hardening baseline</note>
+    </webgui>
+    <ssh>
+      <enabled>enabled</enabled>
+      <interfaces>opt1</interfaces>
+      <passwordauth>0</passwordauth>
+      <permitrootlogin>0</permitrootlogin>
+      <group>admins</group>
+      <port>19992</port>
+      <note>[AI-Gen] Disable SSH password auth and root login - SSH hardening</note>
+    </ssh>
+    <dns>
+      <resolver>unbound</resolver>
+      <allow_override>0</allow_override>
+    </dns>
+  </system>
+  <authentication>
+    <local_root>
+      <disabled>1</disabled>
+      <prerequisite>Create a separate named admin with SSH key and TOTP before disabling root login.</prerequisite>
+      <note>[AI-Gen] Disable direct root administration - Least privilege</note>
+    </local_root>
+    <ldap>
+      <bind_user />
+      <transport>StartTLS</transport>
+      <rotate_secret>1</rotate_secret>
+      <create_local_users>0</create_local_users>
+      <note>[AI-Gen] Replace privileged LDAP bind and rotate leaked secret - LDAP hardening</note>
+    </ldap>
+  </authentication>
+  <snmp>
+    <enabled>0</enabled>
+    <community>REMOVE_PUBLIC</community>
+    <preferred>SNMPv3</preferred>
+    <note>[AI-Gen] Remove public SNMP community or migrate to SNMPv3 - SNMP hardening</note>
+  </snmp>
+  <wireguard>
+    <server>
+      <rotate_private_key>1</rotate_private_key>
+      <debug>0</debug>
+      <note>[AI-Gen] Rotate exposed WireGuard private key and disable debug - VPN key hygiene</note>
+    </server>
+  </wireguard>
+  <openvpn>
+    <server>
+      <proto>udp4</proto>
+      <port>11194</port>
+      <local />
+      <warning>Add 192.168.10.0/24 as a separate admin-only push route only when an admin-scoped VPN firewall policy exists for MGMT.</warning>
+      <push_route>192.168.20.0/24,192.168.30.0/24,192.168.40.0/24,192.168.226.0/24</push_route>
+      <description>[AI-Gen] Leave OpenVPN bind unset for dual-mode operation and keep MGMT route push separate from the baseline server policy - OpenVPN reachability</description>
+    </server>
+  </openvpn>
+  <aliases>
+    <alias>
+      <name>ALI_NET_MGMT</name>
+      <type>network</type>
+      <content>192.168.10.0/24</content>
+    </alias>
+    <alias>
+      <name>ALI_NET_SERVER</name>
+      <type>network</type>
+      <content>192.168.20.0/24</content>
+    </alias>
+    <alias>
+      <name>ALI_NET_DEV</name>
+      <type>network</type>
+      <content>192.168.30.0/24</content>
+    </alias>
+    <alias>
+      <name>ALI_NET_OFFICE</name>
+      <type>network</type>
+      <content>192.168.40.0/24</content>
+    </alias>
+    <alias>
+      <name>ALI_NET_VOICE</name>
+      <type>network</type>
+      <content>192.168.50.0/24</content>
+    </alias>
+    <alias>
+      <name>ALI_NET_IOT</name>
+      <type>network</type>
+      <content>192.168.60.0/24</content>
+    </alias>
+    <alias>
+      <name>ALI_NET_UPSTREAM</name>
+      <type>network</type>
+      <content>192.168.226.0/24</content>
+    </alias>
+    <alias>
+      <name>ALI_PORT_MGMT</name>
+      <type>port</type>
+      <content>22,443,8443,19992</content>
+    </alias>
+  </aliases>
+</opnsense-security-hardening>

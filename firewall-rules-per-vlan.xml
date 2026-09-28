@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<firewall-rules-per-vlan>
+  <aliases>
+    <alias><name>ALI_NET_MGMT</name><type>network</type><content>192.168.10.0/24</content></alias>
+    <alias><name>ALI_NET_SERVER</name><type>network</type><content>192.168.20.0/24</content></alias>
+    <alias><name>ALI_NET_DEV</name><type>network</type><content>192.168.30.0/24</content></alias>
+    <alias><name>ALI_NET_OFFICE</name><type>network</type><content>192.168.40.0/24</content></alias>
+    <alias><name>ALI_NET_VOICE</name><type>network</type><content>192.168.50.0/24</content></alias>
+    <alias><name>ALI_NET_IOT</name><type>network</type><content>192.168.60.0/24</content></alias>
+    <alias><name>ALI_NET_UPSTREAM</name><type>network</type><content>192.168.226.0/24</content></alias>
+    <alias><name>ALI_NET_RFC1918</name><type>network</type><content>10.0.0.0/8,172.16.0.0/12,192.168.0.0/16</content></alias>
+    <alias><name>ALI_HOST_UPSTREAM_UBUNTU_GW</name><type>host</type><content>192.168.226.3</content></alias>
+    <alias><name>ALI_NET_VPN</name><type>network</type><content>10.8.0.0/24,10.10.0.0/24</content></alias>
+    <alias><name>ALI_NET_VPN_APPROVED</name><type>network</type><content>192.168.20.0/24,192.168.30.0/24,192.168.226.0/24</content></alias>
+    <alias><name>ALI_NET_VPN_INTERNAL_APPROVED</name><type>network</type><content>10.8.0.128/25</content></alias>
+    <alias><name>ALI_NET_VPN_MGMT_ADMINS</name><type>network</type><content>10.8.0.240/28</content></alias>
+    <alias><name>ALI_NET_MGMT_APPROVED</name><type>network</type><content>192.168.20.0/24,192.168.30.0/24,192.168.226.0/24</content></alias>
+    <alias><name>ALI_NET_BLOCKED_FROM_VOICE</name><type>network</type><content>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.40.0/24,192.168.60.0/24</content></alias>
+    <alias><name>ALI_NET_BLOCKED_FROM_IOT</name><type>network</type><content>192.168.10.0/24,192.168.20.0/24,192.168.30.0/24,192.168.40.0/24</content></alias>
+    <alias><name>ALI_PORT_DNS</name><type>port</type><content>53</content></alias>
+    <alias><name>ALI_PORT_NTP</name><type>port</type><content>123</content></alias>
+    <alias><name>ALI_PORT_SIP</name><type>port</type><content>5060,5061</content></alias>
+    <alias><name>ALI_PORT_RTP</name><type>port</type><content>10000:20000</content></alias>
+    <alias><name>ALI_PORT_MGMT</name><type>port</type><content>22,443,8443,19992</content></alias>
+    <alias><name>ALI_PORT_OPENVPN</name><type>port</type><content>11194</content></alias>
+  </aliases>
+  <rules>
+    <rule>
+      <interface>opt1</interface>
+      <action>pass</action>
+      <protocol>tcp</protocol>
+      <source>ALI_NET_MGMT</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_MGMT</destination_port>
+      <description>[AI-Gen] Allow MGMT admin access to firewall - VLAN10 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt1</interface>
+      <action>pass</action>
+      <source>ALI_NET_MGMT</source>
+      <destination>ALI_NET_MGMT_APPROVED</destination>
+      <description>[AI-Gen] Allow MGMT to approved internal admin networks only - VLAN10 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt2</interface>
+      <action>pass</action>
+      <source>ALI_NET_SERVER</source>
+      <destination>ALI_NET_UPSTREAM</destination>
+      <description>[AI-Gen] Allow Server subnet to upstream services only - VLAN20 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt3</interface>
+      <action>block</action>
+      <source>ALI_NET_DEV</source>
+      <destination>ALI_NET_MGMT</destination>
+      <description>[AI-Gen] Block Dev direct access to MGMT - Segmentation baseline</description>
+    </rule>
+    <rule>
+      <interface>opt3</interface>
+      <action>pass</action>
+      <source>ALI_NET_DEV</source>
+      <destination>ALI_NET_RFC1918</destination>
+      <destination_not>1</destination_not>
+      <gateway>GW_FAILOVER</gateway>
+      <description>[AI-Gen] Allow Dev internet-only egress with policy routing - VLAN30 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt4</interface>
+      <action>pass</action>
+      <source>ALI_NET_OFFICE</source>
+      <destination>ALI_NET_RFC1918</destination>
+      <destination_not>1</destination_not>
+      <gateway>GW_FAILOVER</gateway>
+      <description>[AI-Gen] Allow Office internet-only egress with policy routing - VLAN40 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt5</interface>
+      <action>pass</action>
+      <protocol>tcp/udp</protocol>
+      <source>ALI_NET_VOICE</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_DNS</destination_port>
+      <description>[AI-Gen] Allow Voice DNS to firewall - VLAN50 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt5</interface>
+      <action>pass</action>
+      <protocol>udp</protocol>
+      <source>ALI_NET_VOICE</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_NTP</destination_port>
+      <description>[AI-Gen] Allow Voice NTP to firewall - VLAN50 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt5</interface>
+      <action>pass</action>
+      <protocol>tcp/udp</protocol>
+      <source>ALI_NET_VOICE</source>
+      <destination>ALI_NET_UPSTREAM</destination>
+      <destination_port>ALI_PORT_SIP</destination_port>
+      <description>[AI-Gen] Allow Voice SIP to upstream PBX/gateway - VLAN50 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt5</interface>
+      <action>pass</action>
+      <protocol>udp</protocol>
+      <source>ALI_NET_VOICE</source>
+      <destination>ALI_NET_UPSTREAM</destination>
+      <destination_port>ALI_PORT_RTP</destination_port>
+      <description>[AI-Gen] Allow Voice RTP media to upstream PBX/gateway - VLAN50 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt5</interface>
+      <action>block</action>
+      <source>ALI_NET_VOICE</source>
+      <destination>ALI_NET_BLOCKED_FROM_VOICE</destination>
+      <description>[AI-Gen] Block unnecessary Voice lateral access - Segmentation baseline</description>
+    </rule>
+    <rule>
+      <interface>opt6</interface>
+      <action>pass</action>
+      <protocol>tcp/udp</protocol>
+      <source>ALI_NET_IOT</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_DNS</destination_port>
+      <description>[AI-Gen] Allow IoT DNS only - VLAN60 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt6</interface>
+      <action>pass</action>
+      <protocol>udp</protocol>
+      <source>ALI_NET_IOT</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_NTP</destination_port>
+      <description>[AI-Gen] Allow IoT NTP only - VLAN60 baseline</description>
+    </rule>
+    <rule>
+      <interface>opt6</interface>
+      <action>block</action>
+      <source>ALI_NET_IOT</source>
+      <destination>ALI_NET_BLOCKED_FROM_IOT</destination>
+      <description>[AI-Gen] Block IoT lateral movement - Segmentation baseline</description>
+    </rule>
+    <rule>
+      <interface>opt7</interface>
+      <action>pass</action>
+      <protocol>udp</protocol>
+      <source>ALI_HOST_UPSTREAM_UBUNTU_GW</source>
+      <destination>thisfirewall</destination>
+      <destination_port>ALI_PORT_OPENVPN</destination_port>
+      <description>[AI-Gen] Allow Ubuntu gateway OpenVPN handoff to firewall - Port forward fix</description>
+    </rule>
+    <rule>
+      <interface>openvpn</interface>
+      <action>pass</action>
+      <source>ALI_NET_VPN_INTERNAL_APPROVED</source>
+      <destination>ALI_NET_VPN_APPROVED</destination>
+      <description>[AI-Gen] Allow approved VPN role subnet to internal networks - VPN baseline</description>
+    </rule>
+    <rule>
+      <interface>openvpn</interface>
+      <action>pass</action>
+      <protocol>tcp</protocol>
+      <source>ALI_NET_VPN_MGMT_ADMINS</source>
+      <destination>ALI_NET_MGMT</destination>
+      <destination_port>ALI_PORT_MGMT</destination_port>
+      <description>[AI-Gen] Allow admin VPN role subnet to MGMT only - VPN management access</description>
+    </rule>
+  </rules>
+</firewall-rules-per-vlan>

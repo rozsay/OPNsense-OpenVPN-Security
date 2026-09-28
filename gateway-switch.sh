@@ -9,19 +9,22 @@ Usage:
   ./gateway-switch.sh [--apply] [--insecure] test|live
 
 Environment:
-  OPN_HOST            OPNsense host/IP for API reload calls
-  OPN_KEY             OPNsense API key
-  OPN_SECRET          OPNsense API secret
-  OPN_INSECURE        Set to 1 to allow insecure TLS for API calls (default: 0)
-  UBUNTU_WAN_IF       Upstream internet interface on 192.168.226.3 (default: pppoe0)
-  OPN_UPSTREAM_IP     OPNsense upstream IP (default: 192.168.226.31)
-  UBUNTU_TEST_GW      Ubuntu gateway IP (default: 192.168.226.3)
-  EXEC_SSH            Optional SSH target for the Ubuntu gateway (for remote execution)
+  OPN_HOST                    OPNsense host/IP for API reload calls
+  OPN_KEY                     OPNsense API key
+  OPN_SECRET                  OPNsense API secret
+  OPN_INSECURE                Set to 1 to allow insecure TLS for API calls (default: 0)
+  OPN_GATEWAY_RECONFIG_PATH   Optional API path for gateway reconfigure/apply
+  OPN_INTERFACE_RECONFIG_PATH Optional API path for interface reconfigure/apply
+  OPN_OPENVPN_RECONFIG_PATH   Optional API path for OpenVPN reconfigure/apply
+  UBUNTU_WAN_IF               Upstream internet interface on 192.168.226.3 (default: pppoe0)
+  OPN_UPSTREAM_IP             OPNsense upstream IP (default: 192.168.226.31)
+  UBUNTU_TEST_GW              Ubuntu gateway IP (default: 192.168.226.3)
+  EXEC_SSH                    Optional SSH target for the Ubuntu gateway (for remote execution)
 
 Notes:
   - Default mode is DRY-RUN. Use --apply to execute.
   - This script changes only the reversible Ubuntu-side TEST/LIVE orchestration points it can do safely.
-  - On OPNsense it only triggers firewall filter apply when API credentials are provided.
+  - On OPNsense it can apply firewall changes and optional reconfigure endpoints when API credentials are provided.
   - Persistent OPNsense gateway, interface, and OpenVPN config edits should still be reviewed and applied via GUI/API as documented.
 USAGE
 }
@@ -29,6 +32,9 @@ USAGE
 MODE=""
 APPLY=0
 OPN_INSECURE="${OPN_INSECURE:-0}"
+OPN_GATEWAY_RECONFIG_PATH="${OPN_GATEWAY_RECONFIG_PATH:-}"
+OPN_INTERFACE_RECONFIG_PATH="${OPN_INTERFACE_RECONFIG_PATH:-}"
+OPN_OPENVPN_RECONFIG_PATH="${OPN_OPENVPN_RECONFIG_PATH:-}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -123,16 +129,31 @@ ubuntu_delete_iptables_rule() {
   fi
 }
 
-opn_firewall_apply() {
+opn_api_post() {
+  local path="$1"
+  [[ -n "$path" ]] || return 0
+
   if [[ -z "${OPN_HOST:-}" || -z "${OPN_KEY:-}" || -z "${OPN_SECRET:-}" ]]; then
-    echo "! OPNsense API credentials not set; skipping optional firewall apply call"
+    echo "! OPNsense API credentials not set; skipping API call to ${path}"
     return 0
   fi
-  local -a curl_cmd=(curl -sS -u "$OPN_KEY:$OPN_SECRET" -H 'Content-Type: application/json' -X POST "https://${OPN_HOST}/api/firewall/filter/apply")
+
+  local -a curl_cmd=(curl -sS -u "$OPN_KEY:$OPN_SECRET" -H 'Content-Type: application/json' -X POST "https://${OPN_HOST}${path}")
   if [[ "$OPN_INSECURE" == "1" ]]; then
-    curl_cmd=(curl -k -sS -u "$OPN_KEY:$OPN_SECRET" -H 'Content-Type: application/json' -X POST "https://${OPN_HOST}/api/firewall/filter/apply")
+    curl_cmd=(curl -k -sS -u "$OPN_KEY:$OPN_SECRET" -H 'Content-Type: application/json' -X POST "https://${OPN_HOST}${path}")
   fi
   run "${curl_cmd[@]}"
+}
+
+opn_apply_steps() {
+  opn_api_post /api/firewall/filter/apply
+  opn_api_post "$OPN_GATEWAY_RECONFIG_PATH"
+  opn_api_post "$OPN_INTERFACE_RECONFIG_PATH"
+  opn_api_post "$OPN_OPENVPN_RECONFIG_PATH"
+
+  if [[ -z "$OPN_GATEWAY_RECONFIG_PATH" || -z "$OPN_INTERFACE_RECONFIG_PATH" || -z "$OPN_OPENVPN_RECONFIG_PATH" ]]; then
+    echo "! Optional OPNsense reconfigure paths are not fully set; persistent gateway/interface/OpenVPN changes still need manual apply if you modified them"
+  fi
 }
 
 add_test_routes() {
@@ -161,10 +182,14 @@ remove_test_routes() {
 
 add_test_openvpn_dnat() {
   ubuntu_ensure_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
+  ubuntu_ensure_iptables_rule filter FORWARD -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j ACCEPT
+  ubuntu_ensure_iptables_rule nat POSTROUTING -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j MASQUERADE
 }
 
 remove_test_openvpn_dnat() {
   ubuntu_delete_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
+  ubuntu_delete_iptables_rule filter FORWARD -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j ACCEPT
+  ubuntu_delete_iptables_rule nat POSTROUTING -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j MASQUERADE
 }
 
 show_manual_opnsense_steps() {
@@ -197,13 +222,13 @@ if [[ "$MODE" == "test" ]]; then
   echo "Switching toward TEST mode"
   add_test_routes
   add_test_openvpn_dnat
-  opn_firewall_apply
+  opn_apply_steps
   show_manual_opnsense_steps
 else
   echo "Switching toward LIVE mode"
   remove_test_openvpn_dnat
   remove_test_routes
-  opn_firewall_apply
+  opn_apply_steps
   show_manual_opnsense_steps
 fi
 

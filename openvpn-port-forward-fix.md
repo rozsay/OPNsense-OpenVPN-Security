@@ -37,7 +37,7 @@ Példa iptables:
 iptables -t nat -A PREROUTING -i pppoe0 -p udp --dport 11194 -j DNAT --to-destination 192.168.226.31:11194
 ```
 
-A preferált megoldás **nem** a SNAT, hanem az, hogy teszt módban az OPNsense visszaútja a `192.168.226.3` Ubuntu gateway felé mutasson, így a valódi kliens-IP megmarad a naplókban és a tűzfalszabályokban is.
+Standard Ubuntu DNAT+FORWARD esetben az OPNsense az `opt7` oldalon jellemzően a **`192.168.226.3` Ubuntu gatewayt fogja forrásként látni**, ezért az OPNsense upstream firewall szabályt ehhez a hophoz kell igazítani. Teszt módban továbbra is szükséges, hogy az OPNsense válaszútja a `192.168.226.3` felé menjen vissza, különben aszimmetrikus lehet a flow.
 
 ## 2. OPNsense upstream firewall ellenőrzés
 

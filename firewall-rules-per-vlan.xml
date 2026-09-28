@@ -8,7 +8,7 @@
     <alias><name>ALI_NET_VOICE</name><type>network</type><content>192.168.50.0/24</content></alias>
     <alias><name>ALI_NET_IOT</name><type>network</type><content>192.168.60.0/24</content></alias>
     <alias><name>ALI_NET_UPSTREAM</name><type>network</type><content>192.168.226.0/24</content></alias>
-    <alias><name>ALI_NET_TEST_OPENVPN_SOURCES</name><type>network</type><content>203.0.113.4/32</content></alias>
+    <alias><name>ALI_NET_REMOTE_OPENVPN_SOURCES</name><type>network</type><content>203.0.113.4/32</content></alias>
     <alias><name>ALI_NET_VPN</name><type>network</type><content>10.8.0.0/24,10.10.0.0/24</content></alias>
     <alias><name>ALI_NET_VPN_APPROVED</name><type>network</type><content>192.168.20.0/24,192.168.30.0/24,192.168.226.0/24</content></alias>
     <alias><name>ALI_NET_VPN_INTERNAL_APPROVED</name><type>network</type><content>10.8.0.128/25</content></alias>
@@ -141,7 +141,7 @@
       <interface>opt7</interface>
       <action>pass</action>
       <protocol>udp</protocol>
-      <source>ALI_NET_TEST_OPENVPN_SOURCES</source>
+      <source>ALI_NET_REMOTE_OPENVPN_SOURCES</source>
       <destination>thisfirewall</destination>
       <destination_port>11194</destination_port>
       <description>[AI-Gen] Allow approved remote OpenVPN sources via Ubuntu gateway - Port forward fix</description>

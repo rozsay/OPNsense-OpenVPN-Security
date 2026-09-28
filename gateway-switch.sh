@@ -21,6 +21,7 @@ Environment:
   UBUNTU_TEST_GW              Ubuntu gateway IP (default: 192.168.226.3)
   EXEC_SSH                    Optional SSH target for the Ubuntu gateway (for remote execution)
   OPENVPN_ALLOWED_SRC         Required source CIDR allowed to hit UDP/11194 in TEST mode
+  CONFIRM_RETURN_PATH_VIA_UBUNTU Set to 1 to confirm OPNsense replies return via 192.168.226.3 in TEST mode
 
 Notes:
   - Default mode is DRY-RUN. Use --apply to execute.
@@ -68,6 +69,7 @@ OPN_UPSTREAM_IP="${OPN_UPSTREAM_IP:-192.168.226.31}"
 UBUNTU_TEST_GW="${UBUNTU_TEST_GW:-192.168.226.3}"
 EXEC_SSH="${EXEC_SSH:-}"
 OPENVPN_ALLOWED_SRC="${OPENVPN_ALLOWED_SRC:-}"
+CONFIRM_RETURN_PATH_VIA_UBUNTU="${CONFIRM_RETURN_PATH_VIA_UBUNTU:-0}"
 
 run() {
   printf '+ '
@@ -78,15 +80,26 @@ run() {
   fi
 }
 
+preview_conditional_add() {
+  printf '+ if missing: '
+  printf '%q ' "$@"
+  printf '
+'
+}
+
 quote_join() {
   local out
   printf -v out '%q ' "$@"
   printf '%s' "${out% }"
 }
 
-require_openvpn_allowed_src() {
+require_test_mode_prereqs() {
   if [[ -z "$OPENVPN_ALLOWED_SRC" ]]; then
     echo "OPENVPN_ALLOWED_SRC must be set (example: 203.0.113.4/32) before publishing UDP/11194 in TEST mode" >&2
+    exit 1
+  fi
+  if [[ "$CONFIRM_RETURN_PATH_VIA_UBUNTU" != "1" ]]; then
+    echo "CONFIRM_RETURN_PATH_VIA_UBUNTU=1 is required to acknowledge that OPNsense replies return via 192.168.226.3 in TEST mode" >&2
     exit 1
   fi
 }
@@ -117,8 +130,7 @@ ubuntu_ensure_iptables_rule() {
       fi
     fi
   else
-    ubuntu_run iptables -t "$table" -C "$chain" "$@"
-    ubuntu_run iptables -t "$table" -A "$chain" "$@"
+    preview_conditional_add iptables -t "$table" -A "$chain" "$@"
   fi
 }
 
@@ -190,13 +202,13 @@ remove_test_routes() {
 }
 
 add_test_openvpn_dnat() {
-  require_openvpn_allowed_src
+  require_test_mode_prereqs
   ubuntu_ensure_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
   ubuntu_ensure_iptables_rule filter FORWARD -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j ACCEPT
 }
 
 remove_test_openvpn_dnat() {
-  require_openvpn_allowed_src
+  require_test_mode_prereqs
   ubuntu_delete_iptables_rule nat PREROUTING -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp --dport 11194 -j DNAT --to-destination "$OPN_UPSTREAM_IP:11194"
   ubuntu_delete_iptables_rule filter FORWARD -i "$UBUNTU_WAN_IF" -s "$OPENVPN_ALLOWED_SRC" -p udp -d "$OPN_UPSTREAM_IP" --dport 11194 -j ACCEPT
 }
@@ -210,6 +222,7 @@ Manual OPNsense checkpoints for TEST mode:
 - OpenVPN server should stay on UDP/11194
 - OpenVPN local bind should be blank or ${OPN_UPSTREAM_IP}
 - OPENVPN_ALLOWED_SRC should be set to the remote client CIDR(s) permitted in TEST mode
+- CONFIRM_RETURN_PATH_VIA_UBUNTU=1 should only be set when OPNsense replies are known to return via 192.168.226.3 in TEST mode
 - OpenVPN push routes should include 192.168.10.0/24 if MGMT access is required
 - Re-apply firewall/filter after changes
 - Reconfigure gateway/interface/OpenVPN services manually after persistent OPNsense-side changes

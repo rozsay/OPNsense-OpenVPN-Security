@@ -1,0 +1,5 @@
+# proto,kulso_port,cel_ip,cel_port,forras,leiras   (ÉLES módban az OPNsense PPPoE-ján; a [ELES] taget a script teszi elé)
+# A teljes listát a 226.3-on generáld:  topsoft-mode.sh export-dnat > eles_portforwards.csv
+# A levelezés (25,465,587,993,995) és az SQL 1433 már szerepel a meglévő NAT 1100 / 900 szabályban.
+proto,dport,target,lport,src,descr
+udp,1987,192.168.226.3,1987,any,OpenVPN 226.3 (legacy 1987)

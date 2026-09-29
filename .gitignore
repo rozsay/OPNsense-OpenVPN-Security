@@ -1,0 +1,74 @@
+# Delphi User-specific project files
+*.local
+*.identcache
+*.stat
+*.tgs
+*.tgw
+*.drc
+*.dproj.local
+*.cbproj.local
+*.personality
+_history/
+
+#Private
+*.conf
+*.gpg
+*.crt
+*.pem
+*.key
+*.log
+
+# Compiler generated files
+*.obj
+*.o
+*.dcu
+*.ddp
+*.ppu
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.bpl
+*.dcp
+*.bpi
+*.drc
+*.map
+*.rsm
+*.tds
+*.dproj.swd
+*.exe
+
+# Output directories
+__history/
+__astcache/
+Win32/
+Win64/
+iOSDevice32/
+iOSDevice64/
+iOSSimulator/
+Android/
+Android64/
+Linux64/
+OSX32/
+OSX64/
+OSXARM64/
+
+# Backup and temporary files
+*.~*
+*.bak
+*.tmp
+*.log
+Thumbs.db
+desktop.ini
+
+# Package output and cache
+*.dcpil
+
+# Linux bash teszt-keret (bats-core) - ha nincs telepítve rendszerszinten,
+# a Linux/tests/run_tests.sh ide tölti le ideiglenesen, ez nem kerül be a
+# repóba
+Linux/tests/.bats-vendor/
+
+# DUnitX teszt-futtatás kimenete (NUnit XML riport) - generált artefakt
+Delphi/Tests/GpgTopsyncTests-results.xml

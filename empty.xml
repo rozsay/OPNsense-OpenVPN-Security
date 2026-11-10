@@ -321,14 +321,14 @@
     <sudo_allow_wheel>1</sudo_allow_wheel>
     <user_allow_gen_token>admins,VPN_Users,VPN_Dev</user_allow_gen_token>
     <backup>
-      <git version="1.0.0" persisted_at="1792483942.20" description="Git Backup Settings">
+      <git version="1.0.0" persisted_at="1792658330.61" description="Git Backup Settings">
         <enabled>0</enabled>
         <url />
         <branch>master</branch>
         <force_push>0</force_push>
         <privkey>REDACTED_PRIVATE_KEY</privkey>
         <user>sa</user>
-        <password>REDACTED_PASSWORD</password>
+        <password />
       </git>
       <sftp version="1.0.0" persisted_at="1792484474.99" description="OPNsense sftp Backup Settings">
         <enabled>1</enabled>
@@ -339,6 +339,10 @@
         <prefixhostname>1</prefixhostname>
       </sftp>
     </backup>
+    <sshguard_threshold>15</sshguard_threshold>
+    <sshguard_blocktime>600</sshguard_blocktime>
+    <sshguard_detection_time>3600</sshguard_detection_time>
+    <sshguard_whitelist>192.168.10.0/24 192.168.30.71/32</sshguard_whitelist>
   </system>
   <interfaces>
     <lan>
@@ -346,6 +350,7 @@
       <descr>LAN1</descr>
       <enable>1</enable>
       <spoofmac />
+      <lock>0</lock>
     </lan>
     <lo0>
       <internal_dynamic>1</internal_dynamic>
@@ -366,6 +371,7 @@
       <spoofmac />
       <blockpriv>1</blockpriv>
       <blockbogons>1</blockbogons>
+      <lock>0</lock>
     </wan>
     <opt1>
       <if>vlan010</if>
@@ -374,6 +380,7 @@
       <spoofmac />
       <ipaddr>192.168.10.1</ipaddr>
       <subnet>24</subnet>
+      <lock>0</lock>
     </opt1>
     <opt2>
       <if>vlan020</if>
@@ -382,6 +389,7 @@
       <spoofmac />
       <ipaddr>192.168.20.1</ipaddr>
       <subnet>24</subnet>
+      <lock>0</lock>
     </opt2>
     <opt3>
       <if>vlan030</if>
@@ -390,6 +398,7 @@
       <spoofmac />
       <ipaddr>192.168.30.1</ipaddr>
       <subnet>24</subnet>
+      <lock>0</lock>
     </opt3>
     <opt4>
       <if>vlan040</if>
@@ -398,6 +407,7 @@
       <spoofmac />
       <ipaddr>192.168.40.1</ipaddr>
       <subnet>24</subnet>
+      <lock>0</lock>
     </opt4>
     <opt5>
       <if>vlan050</if>
@@ -406,6 +416,7 @@
       <spoofmac />
       <ipaddr>192.168.50.1</ipaddr>
       <subnet>24</subnet>
+      <lock>0</lock>
     </opt5>
     <opt6>
       <if>vlan060</if>
@@ -414,6 +425,7 @@
       <spoofmac />
       <ipaddr>192.168.60.1</ipaddr>
       <subnet>24</subnet>
+      <lock>0</lock>
     </opt6>
     <opt7>
       <if>igb1</if>
@@ -422,12 +434,16 @@
       <spoofmac />
       <ipaddr>192.168.226.31</ipaddr>
       <subnet>24</subnet>
+      <lock>0</lock>
     </opt7>
     <opt8>
       <if>pppoe0</if>
       <descr>OPT8_PPPOE</descr>
       <spoofmac />
       <ipaddr>pppoe</ipaddr>
+      <blockpriv>1</blockpriv>
+      <blockbogons>1</blockbogons>
+      <lock>0</lock>
     </opt8>
     <wireguard>
       <internal_dynamic>1</internal_dynamic>
@@ -443,6 +459,7 @@
       <descr>WG_Server</descr>
       <enable>1</enable>
       <spoofmac />
+      <lock>0</lock>
     </opt9>
     <openvpn>
       <internal_dynamic>1</internal_dynamic>
@@ -537,11 +554,31 @@
     <opt10>
       <descr>VPN_1</descr>
       <if>ovpns1</if>
+      <lock>0</lock>
     </opt10>
     <opt11>
       <descr>VPN_2</descr>
       <if>ovpns2</if>
+      <lock>0</lock>
     </opt11>
+    <opt12>
+      <if>vlan070</if>
+      <descr>OPT7_WLAN_07</descr>
+      <enable>1</enable>
+      <lock>1</lock>
+      <spoofmac />
+      <ipaddr>192.168.70.1</ipaddr>
+      <subnet>24</subnet>
+    </opt12>
+    <G_WLAN>
+      <internal_dynamic>1</internal_dynamic>
+      <enable>1</enable>
+      <networks />
+      <if>G_WLAN</if>
+      <descr>G_WLAN</descr>
+      <virtual>1</virtual>
+      <type>group</type>
+    </G_WLAN>
   </interfaces>
   <dnsmasq version="1.0.9" persisted_at="1792391029.75" description="Dnsmasq DNS and DHCP">
     <enable>0</enable>
@@ -590,13 +627,13 @@
   <nat>
     <rule uuid="8951c90a-51c8-46b1-941b-c00cdf02707c">
       <sequence>900</sequence>
-      <disabled>0</disabled>
+      <disabled>1</disabled>
       <nordr>0</nordr>
       <interface>opt8</interface>
       <ipprotocol>inet</ipprotocol>
       <protocol>tcp</protocol>
       <source>
-        <network>37.220.139.52/24</network>
+        <network>A_HOST_IP_LOVAS</network>
         <port />
         <not>0</not>
       </source>
@@ -610,7 +647,7 @@
       <poolopts />
       <log>0</log>
       <category />
-      <descr>SQL elerhetoseg csak IP_LOVAS forrasrol TCP 1433</descr>
+      <descr>[ELES] SQL elerhetoseg csak IP_LOVAS forrasrol TCP 1433</descr>
       <tag />
       <tagged />
       <nosync>0</nosync>
@@ -630,32 +667,72 @@
     </rule>
     <rule uuid="1e048cdb-c438-4f5f-821c-37535b5c58b2">
       <sequence>1100</sequence>
-      <disabled>0</disabled>
+      <disabled>1</disabled>
       <nordr>0</nordr>
       <interface>opt8</interface>
       <ipprotocol>inet</ipprotocol>
       <protocol>tcp</protocol>
       <source>
-        <network>opt8ip</network>
-        <port>A_PORT_Postfix_portok_226</port>
+        <network>any</network>
+        <port />
         <not>0</not>
       </source>
       <destination>
-        <network>A_HOST_GW</network>
-        <port>A_PORT_Postfix_portok_226</port>
+        <network>opt8ip</network>
+        <port>A_PORT_MAIL_CLIENT_226</port>
         <not>0</not>
       </destination>
       <target>192.168.226.3</target>
-      <local-port>A_PORT_Postfix_portok_226</local-port>
+      <local-port>A_PORT_MAIL_CLIENT_226</local-port>
       <poolopts />
       <log>0</log>
       <category />
-      <descr>Postfix 226 Külső bejövő levelezés</descr>
+      <descr>[ELES] Postfix 226 Külső bejövő levelezés</descr>
       <tag />
       <tagged />
       <nosync>0</nosync>
       <natreflection />
-      <pass>pass</pass>
+      <pass />
+      <associated-rule-id />
+      <created>
+        <username>root@192.168.30.71</username>
+        <time>1789363410.15</time>
+        <description>/firewall_nat_edit.php made changes</description>
+      </created>
+      <updated>
+        <username>root</username>
+        <time>1792647301.77</time>
+        <description>/api/api.php made changes</description>
+      </updated>
+    </rule>
+    <rule uuid="b2e73466-7603-4cfe-9b2b-d3cd2acd5176">
+      <sequence>1110</sequence>
+      <disabled>1</disabled>
+      <nordr>0</nordr>
+      <interface>opt8</interface>
+      <ipprotocol>inet</ipprotocol>
+      <protocol>tcp</protocol>
+      <source>
+        <network>any</network>
+        <port />
+        <not>0</not>
+      </source>
+      <destination>
+        <network>opt8ip</network>
+        <port>25</port>
+        <not>0</not>
+      </destination>
+      <target>192.168.226.3</target>
+      <local-port>25</local-port>
+      <poolopts />
+      <log>0</log>
+      <category />
+      <descr>[ELES] DNAT SMTP 25 -&gt; 226.3</descr>
+      <tag />
+      <tagged />
+      <nosync>0</nosync>
+      <natreflection />
+      <pass />
       <associated-rule-id />
       <created>
         <username>root@192.168.30.71</username>
@@ -764,7 +841,7 @@
         <destination>
           <any>1</any>
         </destination>
-        <descr>Kimentő NAT beállítások (Outbound NAT)</descr>
+        <descr>[ELES] Kimentő NAT beállítások (Outbound NAT)</descr>
         <category />
         <interface>opt8</interface>
         <tag />
@@ -785,6 +862,7 @@
           <time>1790048688.35</time>
           <description>/firewall_nat_out_edit.php made changes</description>
         </created>
+        <disabled>1</disabled>
       </rule>
       <rule>
         <source>
@@ -793,7 +871,7 @@
         <destination>
           <any>1</any>
         </destination>
-        <descr>Kimentő NAT beállítások (Outbound NAT) for 226 VoIP network via PPPoE</descr>
+        <descr>[ELES] Kimentő NAT beállítások (Outbound NAT) for 226 VoIP network via PPPoE</descr>
         <category />
         <interface>opt8</interface>
         <tag />
@@ -815,6 +893,7 @@
           <time>1790222644.47</time>
           <description>/firewall_nat_out_edit.php made changes</description>
         </updated>
+        <disabled>1</disabled>
       </rule>
       <mode>hybrid</mode>
     </outbound>
@@ -822,20 +901,17 @@
   <filter>
     <bypassstaticroutes>yes</bypassstaticroutes>
   </filter>
-  <rrd>
-    <enable />
-  </rrd>
   <ntpd>
     <prefer>hu.pool.ntp.org</prefer>
   </ntpd>
   <revision>
-    <username>root@192.168.30.71</username>
-    <description>/api/firewall/filter/set_rule/31e99261-da96-43b2-8361-40a0c445fb66 made changes</description>
-    <time>1792650081.64</time>
+    <username>rozsay@192.168.30.71</username>
+    <description>Changed backup revision count</description>
+    <time>1794298591.23</time>
   </revision>
   <OPNsense>
     <wireguard>
-      <client version="1.0.0" persisted_at="1792045380.99" description="WireGuard peer configuration">
+      <client version="1.0.0" persisted_at="1793619122.05" description="WireGuard peer configuration">
         <clients>
           <client uuid="91fd4bf7-e8c3-4ba1-802a-04f2a03f86cd">
             <enabled>1</enabled>
@@ -846,6 +922,7 @@
             <serveraddress />
             <serverport />
             <keepalive>25</keepalive>
+            <privkey />
           </client>
           <client uuid="40da9573-6229-48f9-b8e9-acc3e3010df4">
             <enabled>1</enabled>
@@ -856,6 +933,7 @@
             <serveraddress />
             <serverport />
             <keepalive>25</keepalive>
+            <privkey />
           </client>
           <client uuid="bc23b183-fa5f-49e0-8ba4-ac1e642140e4">
             <enabled>1</enabled>
@@ -866,6 +944,7 @@
             <serveraddress />
             <serverport />
             <keepalive>25</keepalive>
+            <privkey />
           </client>
           <client uuid="9159ef34-e351-4090-a5ac-8c760158d505">
             <enabled>1</enabled>
@@ -876,13 +955,58 @@
             <serveraddress />
             <serverport />
             <keepalive>25</keepalive>
+            <privkey />
+          </client>
+          <client uuid="44f15551-728e-4893-a813-d4dc1f3fc36d">
+            <enabled>1</enabled>
+            <name>kondorg</name>
+            <pubkey>REDACTED_PUBKEY</pubkey>
+            <psk>REDACTED_PSK</psk>
+            <tunneladdress>10.10.0.6/32</tunneladdress>
+            <serveraddress />
+            <serverport />
+            <keepalive>25</keepalive>
+            <privkey />
+          </client>
+          <client uuid="5f36a580-4b1b-4a31-a0d3-3d8c030a8d29">
+            <enabled>1</enabled>
+            <name>vincze</name>
+            <pubkey>REDACTED_PUBKEY</pubkey>
+            <psk>REDACTED_PSK</psk>
+            <tunneladdress>10.10.0.7/32</tunneladdress>
+            <serveraddress />
+            <serverport />
+            <keepalive />
+            <privkey />
+          </client>
+          <client uuid="c8e626e4-b157-4851-8dc1-18e4393e6763">
+            <enabled>1</enabled>
+            <name>Vinyo</name>
+            <pubkey>REDACTED_PUBKEY</pubkey>
+            <psk>REDACTED_PSK</psk>
+            <tunneladdress>10.10.0.8/32</tunneladdress>
+            <serveraddress />
+            <serverport />
+            <keepalive />
+            <privkey />
+          </client>
+          <client uuid="515b03e5-1e8a-4c17-ba91-8ca862aa0af5">
+            <enabled>1</enabled>
+            <name>VinyoMobil</name>
+            <pubkey>REDACTED_PUBKEY</pubkey>
+            <psk>REDACTED_PSK</psk>
+            <tunneladdress>10.10.0.9/32</tunneladdress>
+            <serveraddress />
+            <serverport />
+            <keepalive />
+            <privkey />
           </client>
         </clients>
       </client>
-      <general version="0.0.1" persisted_at="1792046003.27" description="WireGuard configuration">
+      <general version="0.0.1" persisted_at="1793619123.52" description="WireGuard configuration">
         <enabled>1</enabled>
       </general>
-      <server version="1.0.1" persisted_at="1792649451.09" description="WireGuard instance configuration">
+      <server version="1.0.1" persisted_at="1793619122.09" description="WireGuard instance configuration">
         <servers>
           <server uuid="9ef4c92a-9534-4367-a2f3-3446ae1f26ce">
             <enabled>1</enabled>
@@ -897,10 +1021,11 @@
             <disableroutes>0</disableroutes>
             <gateway />
             <carp_depend_on />
-            <peers>9159ef34-e351-4090-a5ac-8c760158d505,40da9573-6229-48f9-b8e9-acc3e3010df4,bc23b183-fa5f-49e0-8ba4-ac1e642140e4,91fd4bf7-e8c3-4ba1-802a-04f2a03f86cd</peers>
+            <peers>9159ef34-e351-4090-a5ac-8c760158d505,40da9573-6229-48f9-b8e9-acc3e3010df4,bc23b183-fa5f-49e0-8ba4-ac1e642140e4,91fd4bf7-e8c3-4ba1-802a-04f2a03f86cd,44f15551-728e-4893-a813-d4dc1f3fc36d,5f36a580-4b1b-4a31-a0d3-3d8c030a8d29,c8e626e4-b157-4851-8dc1-18e4393e6763,515b03e5-1e8a-4c17-ba91-8ca862aa0af5</peers>
             <debug>0</debug>
             <endpoint>mail.topsoft.hu:51820</endpoint>
             <peer_dns>10.10.0.1</peer_dns>
+            <allowed_ips>10.10.0.0/24</allowed_ips>
           </server>
         </servers>
       </server>
@@ -1019,7 +1144,7 @@ auth-nocache</plain_config>
         </server>
       </servers>
     </OpenVPNExport>
-    <OpenVPN version="1.0.1" persisted_at="1790851314.10" description="OpenVPN">
+    <OpenVPN version="1.0.1" persisted_at="1792658810.08" description="OpenVPN">
       <Overwrites>
         <Overwrite uuid="3b4678d0-3132-4b8e-bc14-47b72cef8cb6">
           <enabled>0</enabled>
@@ -1074,8 +1199,8 @@ auth-nocache</plain_config>
           <data-ciphers>AES-128-GCM,AES-256-GCM,CHACHA20-POLY1305</data-ciphers>
           <data-ciphers-fallback>AES-256-GCM</data-ciphers-fallback>
           <tls_key>a98d7a74-8423-4b0d-ad9b-0cd4d6d028d3</tls_key>
-          <authmode>LDAP_GW,Local Database</authmode>
-          <local_group />
+          <authmode>LDAP_GW,Local Database,Timebased One Time Password</authmode>
+          <local_group>2001</local_group>
           <various_flags>persist-remote-ip,explicit-exit-notify</various_flags>
           <various_push_flags>block-ipv6,block-outside-dns,explicit-exit-notify</various_push_flags>
           <push_inactive />
@@ -1114,7 +1239,7 @@ auth-nocache</plain_config>
           <dev_type>tun</dev_type>
           <verb>3</verb>
           <proto>udp4</proto>
-          <port>11195</port>
+          <port>11196</port>
           <port-share />
           <local />
           <topology>subnet</topology>
@@ -1139,8 +1264,8 @@ auth-nocache</plain_config>
           <data-ciphers>AES-128-GCM,AES-256-GCM,CHACHA20-POLY1305</data-ciphers>
           <data-ciphers-fallback>AES-256-GCM</data-ciphers-fallback>
           <tls_key>a98d7a74-8423-4b0d-ad9b-0cd4d6d028d3</tls_key>
-          <authmode>LDAP_GW,Local Database</authmode>
-          <local_group>2001</local_group>
+          <authmode>LDAP_GW,Local Database,Timebased One Time Password</authmode>
+          <local_group>2000</local_group>
           <various_flags>persist-remote-ip,explicit-exit-notify</various_flags>
           <various_push_flags>block-ipv6,block-outside-dns,explicit-exit-notify</various_push_flags>
           <push_inactive />
@@ -1177,7 +1302,7 @@ auth-nocache</plain_config>
       <StaticKeys>
         <StaticKey uuid="a98d7a74-8423-4b0d-ad9b-0cd4d6d028d3">
           <mode>crypt</mode>
-          <key />
+          <key>REDACTED_KEY</key>
           <description>tls-crypt.key</description>
         </StaticKey>
       </StaticKeys>
@@ -1219,9 +1344,9 @@ auth-nocache</plain_config>
           </template>
         </templates>
       </Lvtemplate>
-      <Alias version="1.0.1" persisted_at="1792649665.45" description="Firewall aliases">
+      <Alias version="1.0.1" persisted_at="1794227015.00" description="Firewall aliases">
         <geoip>
-          <url>https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&amp;license_key=SANITIZED;suffix=zip</url>
+          <url>https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&amp;license_key=;suffix=zip</url>
         </geoip>
         <aliases>
           <alias uuid="f69d716f-bfda-4f96-9eac-f0fd7733eab0">
@@ -1330,7 +1455,7 @@ auth-nocache</plain_config>
           </alias>
           <alias uuid="93b39aaa-0644-46ed-be57-9cbf9aeae5fb">
             <enabled>1</enabled>
-            <name>A_PORT_Postfix_portok_226</name>
+            <name>A_PORT_MAIL_CLIENT_226</name>
             <type>port</type>
             <path_expression />
             <proto />
@@ -1558,7 +1683,7 @@ auth-nocache</plain_config>
           </alias>
           <alias uuid="a58b78b4-0b03-419c-9a8b-186385d4cf21">
             <enabled>1</enabled>
-            <name>A_PORT_DNS</name>
+            <name>A_PORT_DNS_53</name>
             <type>port</type>
             <path_expression />
             <proto />
@@ -1977,6 +2102,97 @@ WS</content>
             <categories>dc438d85-a1d7-4144-bc2e-077b592a26b4</categories>
             <description>OPENVPN portok</description>
           </alias>
+          <alias uuid="1428bc51-7b48-4346-8da4-a61ee1b283fd">
+            <enabled>1</enabled>
+            <name>A_PORT_P2P</name>
+            <type>port</type>
+            <path_expression />
+            <proto />
+            <interface />
+            <counters>0</counters>
+            <updatefreq />
+            <content>6881:6999
+16881:16889
+51413:51420
+4662
+4672</content>
+            <password />
+            <username />
+            <authtype />
+            <expire />
+            <categories />
+            <description>BitTorrent/eMule portok</description>
+          </alias>
+          <alias uuid="e8b11879-2f32-4e83-be3d-16852fe402aa">
+            <enabled>1</enabled>
+            <name>A_PORT_DNS_EXT</name>
+            <type>port</type>
+            <path_expression />
+            <proto />
+            <interface />
+            <counters>0</counters>
+            <updatefreq />
+            <content>53
+853</content>
+            <password />
+            <username />
+            <authtype />
+            <expire />
+            <categories />
+            <description>DNS és DNS-over-TLS</description>
+          </alias>
+          <alias uuid="1d0e357e-05f7-4a28-985a-3d1aa8a19ea8">
+            <enabled>1</enabled>
+            <name>A_PORT_WWWX2_WEB</name>
+            <type>port</type>
+            <path_expression />
+            <proto />
+            <interface />
+            <counters>0</counters>
+            <updatefreq />
+            <content>19000:19900</content>
+            <password />
+            <username />
+            <authtype />
+            <expire />
+            <categories>dc438d85-a1d7-4144-bc2e-077b592a26b4</categories>
+            <description>WWWX2 webes alkalmazás portjai</description>
+          </alias>
+          <alias uuid="df82c07c-9718-4624-b39a-943daba14ef3">
+            <enabled>1</enabled>
+            <name>A_HOST_WLAN_INFRA</name>
+            <type>host</type>
+            <path_expression />
+            <proto />
+            <interface />
+            <counters>0</counters>
+            <updatefreq />
+            <content>192.168.70.71</content>
+            <password />
+            <username />
+            <authtype />
+            <expire />
+            <categories>96c8d9e0-be04-46b8-bb36-eddbf70d0285</categories>
+            <description>akik a 192.168.20.0/24-et elérhetik</description>
+          </alias>
+          <alias uuid="e6d77d47-7965-49ac-9106-dc881b3f187a">
+            <enabled>1</enabled>
+            <name>A_HOST_WLAN_LAN226</name>
+            <type>host</type>
+            <path_expression />
+            <proto />
+            <interface />
+            <counters>0</counters>
+            <updatefreq />
+            <content>192.168.70.71
+192.168.70.69</content>
+            <password />
+            <username />
+            <authtype />
+            <expire />
+            <categories>96c8d9e0-be04-46b8-bb36-eddbf70d0285</categories>
+            <description>akik a 192.168.226.0/24-et elérhetik</description>
+          </alias>
         </aliases>
       </Alias>
       <Category version="1.0.0" persisted_at="1790327947.33" description="Firewall categories">
@@ -2013,7 +2229,7 @@ WS</content>
           </category>
         </categories>
       </Category>
-      <Filter version="1.0.5" persisted_at="1792650081.64" description="Firewall rules (new)">
+      <Filter version="1.0.6" persisted_at="1794227218.31" description="Firewall rules (new)">
         <general />
         <rules>
           <rule uuid="ab290852-31db-433a-b83e-04adbc676ceb">
@@ -2025,6 +2241,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>lan,wan</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -2054,6 +2272,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2070,7 +2290,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Block Accessing CrowdSec Blacklist</description>
+            <description>[ALL] Block Accessing CrowdSec Blacklist</description>
+            <audit />
           </rule>
           <rule uuid="9599a05e-7959-4d0d-a409-90e993565a41">
             <enabled>1</enabled>
@@ -2081,6 +2302,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7,opt8,openvpn,opt9</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -2110,6 +2333,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2126,10 +2351,11 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description />
+            <description>[ALL] SSH 20.23:1964 (tartalek) – LAN2/VPN/PPPoE felől</description>
+            <audit />
           </rule>
           <rule uuid="cb35d1c9-8c14-4ec3-abf3-450c6d7b484a">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>41</sequence>
@@ -2137,6 +2363,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>lan</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -2166,6 +2394,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2182,10 +2412,11 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Default allow LAN to any rule</description>
+            <description>[ALL] Default allow LAN to any rule</description>
+            <audit />
           </rule>
           <rule uuid="437cc0ea-1cd0-4670-835c-731e82fdc929">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>51</sequence>
@@ -2193,6 +2424,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>lan</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet6</ipprotocol>
             <protocol>any</protocol>
@@ -2222,6 +2455,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2238,10 +2473,11 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Default allow LAN IPv6 to any rule</description>
+            <description>[ALL] Default allow LAN IPv6 to any rule</description>
+            <audit />
           </rule>
           <rule uuid="1cf1d6dc-e4f3-4c56-89d5-a8cfefd0f61e">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>61</sequence>
@@ -2249,6 +2485,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>lan</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP/UDP</protocol>
@@ -2278,6 +2516,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2294,7 +2534,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>WSD Nyomtato</description>
+            <description>[ALL] WSD Nyomtato</description>
+            <audit />
           </rule>
           <rule uuid="65659a26-4f35-426e-9863-246ec7b40da2">
             <enabled>1</enabled>
@@ -2305,6 +2546,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>openvpn</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -2313,7 +2556,7 @@ WS</content>
             <source_net>any</source_net>
             <source_not>0</source_not>
             <source_port />
-            <destination_net>(self),opt2,opt2ip,opt3,opt3ip,opt7,opt7ip,openvpn</destination_net>
+            <destination_net>opt2,opt3,opt7</destination_net>
             <destination_not>0</destination_not>
             <destination_port />
             <divert-to />
@@ -2334,6 +2577,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2350,7 +2595,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description />
+            <description>[ALL] OpenVPN -&gt; INFRA/DEV/LAN2 hálók</description>
+            <audit />
           </rule>
           <rule uuid="1f8ffd5a-eacc-4920-bf5b-33cae55f4599">
             <enabled>0</enabled>
@@ -2361,6 +2607,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>openvpn</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -2390,6 +2638,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2406,7 +2656,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Allow OpenVPN to LAN</description>
+            <description>[ALL] Allow OpenVPN to LAN</description>
+            <audit />
           </rule>
           <rule uuid="47097919-7aae-418a-ae22-c39cd36da956">
             <enabled>1</enabled>
@@ -2417,6 +2668,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>openvpn</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -2424,7 +2677,7 @@ WS</content>
             <icmp6type />
             <source_net>openvpn</source_net>
             <source_not>0</source_not>
-            <source_port>3389</source_port>
+            <source_port />
             <destination_net>192.168.226.0/24</destination_net>
             <destination_not>0</destination_not>
             <destination_port>3389</destination_port>
@@ -2446,6 +2699,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2462,7 +2717,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Allow OpenVPN to 192.168.226.0/24 RDP</description>
+            <description>[ALL] Allow OpenVPN to 192.168.226.0/24 RDP</description>
+            <audit />
           </rule>
           <rule uuid="04ffcfda-76b6-4ad2-82c1-709880c10348">
             <enabled>1</enabled>
@@ -2473,6 +2729,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>openvpn</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -2480,7 +2738,7 @@ WS</content>
             <icmp6type />
             <source_net>openvpn</source_net>
             <source_not>0</source_not>
-            <source_port>3389</source_port>
+            <source_port />
             <destination_net>opt7</destination_net>
             <destination_not>0</destination_not>
             <destination_port>3389</destination_port>
@@ -2502,6 +2760,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2518,7 +2778,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Openvpn RDP</description>
+            <description>[ALL] Openvpn RDP</description>
+            <audit />
           </rule>
           <rule uuid="e355bb9e-9622-4422-b382-d7337609d294">
             <enabled>1</enabled>
@@ -2529,6 +2790,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>openvpn</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP/UDP</protocol>
@@ -2558,6 +2821,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2574,7 +2839,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description />
+            <description>[ALL] OpenVPN -&gt; tűzfal DNS</description>
+            <audit />
           </rule>
           <rule uuid="e2f8a41e-b778-4fe4-83a6-c817f75340dd">
             <enabled>1</enabled>
@@ -2585,6 +2851,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt1</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -2614,6 +2882,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2630,7 +2900,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description />
+            <description>[ALL] MGMT -&gt; bárhova</description>
+            <audit />
           </rule>
           <rule uuid="12e1fed0-360d-4f7c-9aa9-c87b94fc744d">
             <enabled>1</enabled>
@@ -2641,6 +2912,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt2</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -2670,6 +2943,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2686,7 +2961,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>INFRA halozat - alap kimeno/belso forgalom engedelyezese</description>
+            <description>[ALL] INFRA halozat - alap kimeno/belso forgalom engedelyezese</description>
+            <audit />
           </rule>
           <rule uuid="03e0cc46-c063-4fa5-b3fa-58f4987468c2">
             <enabled>1</enabled>
@@ -2697,6 +2973,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt3</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -2726,6 +3004,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2742,7 +3022,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description />
+            <description>[ALL] DEV -&gt; bárhova (logolt)</description>
+            <audit />
           </rule>
           <rule uuid="e4076175-2088-4f49-9f20-1fc781f67dc5">
             <enabled>0</enabled>
@@ -2753,6 +3034,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt3</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>out</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -2782,6 +3065,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2798,7 +3083,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Allow RDP from 192.168.30.0/24 to 192.168.226.0/24</description>
+            <description>[ALL] Allow RDP from 192.168.30.0/24 to 192.168.226.0/24</description>
+            <audit />
           </rule>
           <rule uuid="43ac58db-482f-41e1-9e7d-1b918e1115da">
             <enabled>0</enabled>
@@ -2809,6 +3095,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt3</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>out</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -2816,7 +3104,7 @@ WS</content>
             <icmp6type />
             <source_net>192.168.30.0/24</source_net>
             <source_not>0</source_not>
-            <source_port>1992</source_port>
+            <source_port />
             <destination_net>192.168.226.0/24</destination_net>
             <destination_not>0</destination_not>
             <destination_port>1992</destination_port>
@@ -2838,6 +3126,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2854,7 +3144,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Allow 1992 from 192.168.30.0/24 to 192.168.226.0/24</description>
+            <description>[ALL] Allow 1992 from 192.168.30.0/24 to 192.168.226.0/24</description>
+            <audit />
           </rule>
           <rule uuid="8e16ede0-ba22-4f4c-8156-9a0d09d49a72">
             <enabled>0</enabled>
@@ -2865,6 +3156,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt3</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>out</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -2894,6 +3187,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2910,7 +3205,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Allow RDP from 192.168.226.0/24 192.168.30.0/24 to</description>
+            <description>[ALL] Allow RDP from 192.168.226.0/24 192.168.30.0/24 to</description>
+            <audit />
           </rule>
           <rule uuid="d4fed2df-3047-4d61-a05a-634d4bc92b5f">
             <enabled>1</enabled>
@@ -2921,6 +3217,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt3</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -2950,6 +3248,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -2966,7 +3266,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>DEV halozat -&gt; OFFICE  halozat, teljes elerés</description>
+            <description>[ALL] DEV halozat -&gt; OFFICE  halozat, teljes elerés</description>
+            <audit />
           </rule>
           <rule uuid="c3834b7e-9eca-4058-b06d-1ab90fc1a1a6">
             <enabled>1</enabled>
@@ -2977,6 +3278,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt3</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -2984,7 +3287,7 @@ WS</content>
             <icmp6type />
             <source_net>opt3</source_net>
             <source_not>0</source_not>
-            <source_port>3702</source_port>
+            <source_port />
             <destination_net>239.255.255.250/32</destination_net>
             <destination_not>0</destination_not>
             <destination_port>A_PORT_WSD</destination_port>
@@ -3006,6 +3309,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3022,7 +3327,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Allow WS-Discovery WSD Multicast</description>
+            <description>[ALL] Allow WS-Discovery WSD Multicast</description>
+            <audit />
           </rule>
           <rule uuid="32eaaa05-968a-41f9-bd99-2065b6d866ad">
             <enabled>0</enabled>
@@ -3033,6 +3339,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt3</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>any</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -3040,10 +3348,10 @@ WS</content>
             <icmp6type />
             <source_net>192.168.30.0/24</source_net>
             <source_not>0</source_not>
-            <source_port>A_PORT_Postfix_portok_226</source_port>
+            <source_port />
             <destination_net>192.168.226.3/32</destination_net>
             <destination_not>0</destination_not>
-            <destination_port>A_PORT_Postfix_portok_226</destination_port>
+            <destination_port>A_PORT_MAIL_CLIENT_226</destination_port>
             <divert-to />
             <gateway>GW_FAILOVER</gateway>
             <replyto />
@@ -3062,6 +3370,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3078,7 +3388,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Dovecot szerver engedélyezése a 30-as VLAN</description>
+            <description>[ALL] Dovecot szerver engedélyezése a 30-as VLAN</description>
+            <audit />
           </rule>
           <rule uuid="21815117-8e02-452b-b3d5-bd3b391f4a98">
             <enabled>1</enabled>
@@ -3089,6 +3400,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt4</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -3118,6 +3431,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3134,10 +3449,11 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Postfix levelezés</description>
+            <description>[ALL] Postfix levelezés</description>
+            <audit />
           </rule>
           <rule uuid="c0be26a8-ebdf-451c-be83-c7cf18327b83">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>261</sequence>
@@ -3145,6 +3461,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -3174,6 +3492,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3190,10 +3510,11 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Ideiglenes admin elérés LAN2-ről (192.168.226.31)</description>
+            <description>[?] Ideiglenes admin elérés LAN2-ről (192.168.226.31)</description>
+            <audit />
           </rule>
           <rule uuid="8de61b48-531d-4be4-8579-3aedb81bcd05">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>271</sequence>
@@ -3201,6 +3522,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -3230,6 +3553,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3246,7 +3571,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>OFFICE/natív -&gt; DEV halozat elerese</description>
+            <description>[?] OFFICE/natív -&gt; DEV halozat elerese</description>
+            <audit />
           </rule>
           <rule uuid="5b8e4fcc-47de-443e-b420-60eb21892987">
             <enabled>0</enabled>
@@ -3257,6 +3583,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -3286,6 +3614,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3302,7 +3632,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>DEV halozat  - OFFICE/natív</description>
+            <description>[ALL] DEV halozat  - OFFICE/natív</description>
+            <audit />
           </rule>
           <rule uuid="b842c77c-9a08-43bc-be8a-69a54de67930">
             <enabled>1</enabled>
@@ -3313,6 +3644,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -3342,6 +3675,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3358,7 +3693,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Engedélyezés a 226-os hálózatról</description>
+            <description>[ALL] Engedélyezés a 226-os hálózatról</description>
+            <audit />
           </rule>
           <rule uuid="c9312d45-c98b-48c3-b99b-8cbc1f3e2777">
             <enabled>1</enabled>
@@ -3369,6 +3705,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>ICMP</protocol>
@@ -3398,6 +3736,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3414,7 +3754,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>ICMP Enable 226.3 to 20.23</description>
+            <description>[ALL] ICMP Enable 226.3 to 20.23</description>
+            <audit />
           </rule>
           <rule uuid="9d55088c-27fe-4e23-881d-caa7436a0f67">
             <enabled>1</enabled>
@@ -3425,6 +3766,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -3432,7 +3775,7 @@ WS</content>
             <icmp6type />
             <source_net>192.168.226.0/24</source_net>
             <source_not>0</source_not>
-            <source_port>1964</source_port>
+            <source_port />
             <destination_net>192.168.20.23/32</destination_net>
             <destination_not>0</destination_not>
             <destination_port>1964</destination_port>
@@ -3454,6 +3797,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3470,7 +3815,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>SSH Enable 226.3 to 20.23</description>
+            <description>[ALL] SSH Enable 226.3 to 20.23</description>
+            <audit />
           </rule>
           <rule uuid="1411602b-456a-4d36-8c7b-fdcb540b293f">
             <enabled>1</enabled>
@@ -3481,6 +3827,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -3510,6 +3858,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3526,7 +3876,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>IIS szerver engedélyezése a 30-as VLAN felé</description>
+            <description>[ALL] IIS szerver engedélyezése a 30-as VLAN felé</description>
+            <audit />
           </rule>
           <rule uuid="7256e747-7a30-4835-906c-dcf43a418cfa">
             <enabled>1</enabled>
@@ -3537,6 +3888,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -3566,6 +3919,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3582,7 +3937,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>IIS szerver engedélyezése a 30-as VLAN felé</description>
+            <description>[ALL] IIS szerver engedélyezése a 30-as VLAN felé</description>
+            <audit />
           </rule>
           <rule uuid="4e812824-d1c7-4aec-9a81-182b47e7ea39">
             <enabled>0</enabled>
@@ -3593,6 +3949,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -3622,6 +3980,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3638,7 +3998,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description />
+            <description>[ALL] WireGuard 10.10.0.0/24 -&gt; 10.10.0.0/24 LAN2-n (tiltva, felesleges)</description>
+            <audit />
           </rule>
           <rule uuid="392a3b55-0f18-48b7-ab73-988137970c90">
             <enabled>1</enabled>
@@ -3649,6 +4010,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -3678,6 +4041,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3694,7 +4059,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Allow Postfix Outbound SMTP (Port 25) 226</description>
+            <description>[ALL] Allow Postfix Outbound SMTP (Port 25) 226</description>
+            <audit />
           </rule>
           <rule uuid="09ef51af-f714-41bd-aee2-8f9c9dbb7bbe">
             <enabled>1</enabled>
@@ -3705,6 +4071,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -3712,7 +4080,7 @@ WS</content>
             <icmp6type />
             <source_net>opt7</source_net>
             <source_not>0</source_not>
-            <source_port>A_PORT_WSD</source_port>
+            <source_port />
             <destination_net>239.255.255.250/32</destination_net>
             <destination_not>0</destination_not>
             <destination_port>A_PORT_WSD</destination_port>
@@ -3734,6 +4102,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3750,7 +4120,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Allow WS-Discovery WSD Multicast</description>
+            <description>[ALL] Allow WS-Discovery WSD Multicast</description>
+            <audit />
           </rule>
           <rule uuid="3040a6a0-e3d8-4b16-826f-7aebe75d1d43">
             <enabled>1</enabled>
@@ -3761,6 +4132,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP/UDP</protocol>
@@ -3768,7 +4141,7 @@ WS</content>
             <icmp6type />
             <source_net>opt7</source_net>
             <source_not>0</source_not>
-            <source_port>A_PORT_WSD</source_port>
+            <source_port />
             <destination_net>opt2,opt3</destination_net>
             <destination_not>0</destination_not>
             <destination_port>A_PORT_WSD</destination_port>
@@ -3790,6 +4163,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3806,66 +4181,11 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Nyomtatás</description>
-          </rule>
-          <rule uuid="31e99261-da96-43b2-8361-40a0c445fb66">
-            <enabled>0</enabled>
-            <statetype>keep</statetype>
-            <state-policy />
-            <sequence>391</sequence>
-            <action>pass</action>
-            <quick>1</quick>
-            <interfacenot>0</interfacenot>
-            <interface>opt8</interface>
-            <direction>in</direction>
-            <ipprotocol>inet</ipprotocol>
-            <protocol>any</protocol>
-            <icmptype />
-            <icmp6type />
-            <source_net>any</source_net>
-            <source_not>0</source_not>
-            <source_port />
-            <destination_net>any</destination_net>
-            <destination_not>0</destination_not>
-            <destination_port />
-            <divert-to />
-            <gateway />
-            <replyto />
-            <disablereplyto>0</disablereplyto>
-            <log>0</log>
-            <allowopts>0</allowopts>
-            <nosync>0</nosync>
-            <nopfsync>0</nopfsync>
-            <statetimeout />
-            <udp-first />
-            <udp-multiple />
-            <udp-single />
-            <max-src-nodes />
-            <max-src-states />
-            <max-src-conn />
-            <max />
-            <max-src-conn-rate />
-            <max-src-conn-rates />
-            <overload />
-            <adaptivestart />
-            <adaptiveend />
-            <prio />
-            <set-prio />
-            <set-prio-low />
-            <tag />
-            <tagged />
-            <tcpflags1 />
-            <tcpflags2 />
-            <tcpflags_any>0</tcpflags_any>
-            <categories />
-            <sched />
-            <tos />
-            <shaper1 />
-            <shaper2 />
-            <description>**törlése**AllIn torolni</description>
+            <description>[ALL] Nyomtatás</description>
+            <audit />
           </rule>
           <rule uuid="e9d30d00-43f6-484b-88fc-5b0e3282c36d">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>401</sequence>
@@ -3873,6 +4193,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt8</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -3902,6 +4224,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3919,6 +4243,7 @@ WS</content>
             <shaper1 />
             <shaper2 />
             <description>[ELES] SQL elerhetoseg csak IP_LOVAS forrasrol TCP 1433</description>
+            <audit />
           </rule>
           <rule uuid="caba0f69-3533-4e81-8b41-c13a8ec32ccb">
             <enabled>1</enabled>
@@ -3929,6 +4254,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>wireguard</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -3958,6 +4285,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -3974,10 +4303,11 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description />
+            <description>[ALL] WireGuard -&gt; bárhova</description>
+            <audit />
           </rule>
           <rule uuid="1ad6b5d9-3046-4f66-b897-5a86c096b4a1">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>521</sequence>
@@ -3985,6 +4315,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -4014,6 +4346,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4031,6 +4365,7 @@ WS</content>
             <shaper1 />
             <shaper2 />
             <description>[ELES] VoIP telefonok kimenő forgalma a PPPoE felé</description>
+            <audit />
           </rule>
           <rule uuid="2f40326f-2c01-4fde-91f8-477882b0fc44">
             <enabled>0</enabled>
@@ -4041,6 +4376,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -4048,7 +4385,7 @@ WS</content>
             <icmp6type />
             <source_net>opt7</source_net>
             <source_not>0</source_not>
-            <source_port>53</source_port>
+            <source_port />
             <destination_net>opt7ip</destination_net>
             <destination_not>0</destination_not>
             <destination_port>53</destination_port>
@@ -4070,6 +4407,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4086,7 +4425,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Allow DNS to OPNsense (192.168.226.31)</description>
+            <description>[ALL] Allow DNS to OPNsense (192.168.226.31)</description>
+            <audit />
           </rule>
           <rule uuid="914d7a37-68a1-43f1-8ae3-fd27dd1319e5">
             <enabled>1</enabled>
@@ -4097,6 +4437,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>G_ISOLATED_LAN</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP/UDP</protocol>
@@ -4104,10 +4446,10 @@ WS</content>
             <icmp6type />
             <source_net>G_ISOLATED_LAN</source_net>
             <source_not>0</source_not>
-            <source_port>A_PORT_DNS</source_port>
+            <source_port />
             <destination_net>G_ISOLATED_LAN</destination_net>
             <destination_not>0</destination_not>
-            <destination_port>A_PORT_DNS</destination_port>
+            <destination_port>A_PORT_DNS_53</destination_port>
             <divert-to />
             <gateway />
             <replyto />
@@ -4126,6 +4468,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4142,7 +4486,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>G_IALLOW - DNS to Gateway</description>
+            <description>[ALL] G_IALLOW - DNS to Gateway</description>
+            <audit />
           </rule>
           <rule uuid="1b6e2281-d66c-4d5f-9d2e-f999b18f13d7">
             <enabled>1</enabled>
@@ -4153,6 +4498,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -4160,7 +4507,7 @@ WS</content>
             <icmp6type />
             <source_net>(self),opt7</source_net>
             <source_not>0</source_not>
-            <source_port>11194</source_port>
+            <source_port />
             <destination_net>opt1ip</destination_net>
             <destination_not>0</destination_not>
             <destination_port>11194</destination_port>
@@ -4182,6 +4529,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4198,63 +4547,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>OpenVPN 11194 a 226.3 DNAT-jan at a régi LAN ból</description>
-          </rule>
-          <rule uuid="a5693030-cd01-44ac-85d6-3c20a6a366eb">
-            <enabled>1</enabled>
-            <statetype>keep</statetype>
-            <state-policy />
-            <sequence>1021</sequence>
-            <action>pass</action>
-            <quick>1</quick>
-            <interfacenot>0</interfacenot>
-            <interface>opt7</interface>
-            <direction>in</direction>
-            <ipprotocol>inet</ipprotocol>
-            <protocol>UDP</protocol>
-            <icmptype />
-            <icmp6type />
-            <source_net>any</source_net>
-            <source_not>0</source_not>
-            <source_port />
-            <destination_net>any</destination_net>
-            <destination_not>0</destination_not>
-            <destination_port />
-            <divert-to />
-            <gateway />
-            <replyto />
-            <disablereplyto>0</disablereplyto>
-            <log>0</log>
-            <allowopts>0</allowopts>
-            <nosync>0</nosync>
-            <nopfsync>0</nopfsync>
-            <statetimeout />
-            <udp-first />
-            <udp-multiple />
-            <udp-single />
-            <max-src-nodes />
-            <max-src-states />
-            <max-src-conn />
-            <max />
-            <max-src-conn-rate />
-            <max-src-conn-rates />
-            <overload />
-            <adaptivestart />
-            <adaptiveend />
-            <prio />
-            <set-prio />
-            <set-prio-low />
-            <tag />
-            <tagged />
-            <tcpflags1 />
-            <tcpflags2 />
-            <tcpflags_any>0</tcpflags_any>
-            <categories>dc438d85-a1d7-4144-bc2e-077b592a26b4</categories>
-            <sched />
-            <tos />
-            <shaper1 />
-            <shaper2 />
-            <description>**törlése** OPENVPN Dev port from REGI GW</description>
+            <description>[TESZT] OpenVPN 11194 a 226.3 DNAT-jan at a régi LAN ból</description>
+            <audit />
           </rule>
           <rule uuid="4de9ba87-2c45-465b-bc2f-9a0831187732">
             <enabled>1</enabled>
@@ -4265,6 +4559,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -4272,7 +4568,7 @@ WS</content>
             <icmp6type />
             <source_net>opt7ip</source_net>
             <source_not>0</source_not>
-            <source_port>A_PORT_OPENVPNDEV</source_port>
+            <source_port />
             <destination_net>A_NET_MGMT</destination_net>
             <destination_not>0</destination_not>
             <destination_port>A_PORT_OPENVPNDEV</destination_port>
@@ -4294,6 +4590,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4310,7 +4608,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Uj VPN a regi Lanbol</description>
+            <description>[TESZT] Uj VPN a regi Lanbol</description>
+            <audit />
           </rule>
           <rule uuid="422791f5-ef08-4216-9f65-f431b024c0fb">
             <enabled>1</enabled>
@@ -4321,6 +4620,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -4328,7 +4629,7 @@ WS</content>
             <icmp6type />
             <source_net>(self),opt7</source_net>
             <source_not>0</source_not>
-            <source_port>11195</source_port>
+            <source_port />
             <destination_net>opt1ip</destination_net>
             <destination_not>0</destination_not>
             <destination_port>11195</destination_port>
@@ -4350,6 +4651,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4366,7 +4669,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Uj VPN User a régi LAN ból</description>
+            <description>[TESZT] Uj VPN User a régi LAN ból</description>
+            <audit />
           </rule>
           <rule uuid="ac80f56c-fc13-413b-b4a1-47eabd0bd44b">
             <enabled>0</enabled>
@@ -4377,6 +4681,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -4406,6 +4712,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4423,6 +4731,7 @@ WS</content>
             <shaper1 />
             <shaper2 />
             <description>[ALL] 226.3 VPN kliensek -&gt; DEV/INFRA</description>
+            <audit />
           </rule>
           <rule uuid="9c2fde3b-074c-4006-8a3f-d9c9083a794f">
             <enabled>1</enabled>
@@ -4433,6 +4742,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -4440,7 +4751,7 @@ WS</content>
             <icmp6type />
             <source_net>any</source_net>
             <source_not>0</source_not>
-            <source_port>A_PORT_WG</source_port>
+            <source_port />
             <destination_net>opt7ip</destination_net>
             <destination_not>0</destination_not>
             <destination_port>A_PORT_WG</destination_port>
@@ -4462,6 +4773,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4478,10 +4791,11 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>[TEST] WireGuard 51820 a 226.3 DNAT-jan at</description>
+            <description>[TESZT] WireGuard 51820 a 226.3 DNAT-jan at</description>
+            <audit />
           </rule>
           <rule uuid="f48f3e6c-84cb-45c2-a19d-1f16a1a41122">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>1521</sequence>
@@ -4489,6 +4803,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7,opt8</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -4496,7 +4812,7 @@ WS</content>
             <icmp6type />
             <source_net>any</source_net>
             <source_not>0</source_not>
-            <source_port>A_PORT_WG</source_port>
+            <source_port />
             <destination_net>opt8ip</destination_net>
             <destination_not>0</destination_not>
             <destination_port>A_PORT_WG</destination_port>
@@ -4518,6 +4834,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4535,6 +4853,7 @@ WS</content>
             <shaper1 />
             <shaper2 />
             <description>[ELES] Allow WireGuard Inbound (PPPoE)</description>
+            <audit />
           </rule>
           <rule uuid="5c56be9b-4f04-43c0-8a30-1305dfe91515">
             <enabled>1</enabled>
@@ -4545,6 +4864,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>G_VPN</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -4552,7 +4873,7 @@ WS</content>
             <icmp6type />
             <source_net>A_NET_WG,A_NET_VPN1</source_net>
             <source_not>0</source_not>
-            <source_port>A_PORT_SSH</source_port>
+            <source_port />
             <destination_net>A_HOST_GW</destination_net>
             <destination_not>0</destination_not>
             <destination_port>A_PORT_SSH</destination_port>
@@ -4574,6 +4895,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4590,10 +4913,11 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>SSH Port a GW re</description>
+            <description>[ALL] SSH Port a GW re</description>
+            <audit />
           </rule>
           <rule uuid="f5f5ab4c-d3e3-48cb-a2a4-e41c6a1ab970">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>1821</sequence>
@@ -4601,6 +4925,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt8</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -4630,6 +4956,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4646,10 +4974,11 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>GEO kivételek</description>
+            <description>[ELES] GEO kivételek</description>
+            <audit />
           </rule>
           <rule uuid="4bd5a9d6-2157-4359-ad04-f036396cb09f">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>1921</sequence>
@@ -4657,6 +4986,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt8</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -4686,6 +5017,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4703,9 +5036,10 @@ WS</content>
             <shaper1 />
             <shaper2 />
             <description>[ELES] Bejövő SMTP, geoblock nélkül</description>
+            <audit />
           </rule>
           <rule uuid="45d3ed33-352c-479b-9c12-a06e8f63d307">
-            <enabled>1</enabled>
+            <enabled>0</enabled>
             <statetype>keep</statetype>
             <state-policy />
             <sequence>2021</sequence>
@@ -4713,6 +5047,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt8</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>any</protocol>
@@ -4742,6 +5078,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4759,6 +5097,7 @@ WS</content>
             <shaper1 />
             <shaper2 />
             <description>[ELES] GEO tiltás</description>
+            <audit />
           </rule>
           <rule uuid="51aa55de-fe55-4dbb-ae7d-25901f5fc6c9">
             <enabled>1</enabled>
@@ -4769,6 +5108,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -4776,7 +5117,7 @@ WS</content>
             <icmp6type />
             <source_net>A_HOST_GW</source_net>
             <source_not>0</source_not>
-            <source_port>80</source_port>
+            <source_port />
             <destination_net>192.168.30.21</destination_net>
             <destination_not>0</destination_not>
             <destination_port>80</destination_port>
@@ -4798,6 +5139,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4814,7 +5157,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Proxy a frissitesnek</description>
+            <description>[ALL] Proxy a frissitesnek</description>
+            <audit />
           </rule>
           <rule uuid="2ef6822c-7f8b-44f9-8dcd-96cbd6e40c0e">
             <enabled>0</enabled>
@@ -4825,6 +5169,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -4854,6 +5200,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4870,7 +5218,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>wwwx2 SQL mentes -&gt; gw2 SMB (ideiglenes, 20.25-re koltozesig)</description>
+            <description>[ALL] wwwx2 SQL mentes -&gt; gw2 SMB (ideiglenes, 20.25-re koltozesig)</description>
+            <audit />
           </rule>
           <rule uuid="9b131eb3-e5a4-4c95-b66d-ee229286f13c">
             <enabled>0</enabled>
@@ -4881,6 +5230,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>ICMP</protocol>
@@ -4910,6 +5261,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4926,7 +5279,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>wwwx2 SQL mentes -&gt; PING (ideiglenes, 20.25-re koltozesig)</description>
+            <description>[ALL] wwwx2 SQL mentes -&gt; PING (ideiglenes, 20.25-re koltozesig)</description>
+            <audit />
           </rule>
           <rule uuid="54e72e50-9bef-4905-aa4a-691bbca23adb">
             <enabled>1</enabled>
@@ -4937,6 +5291,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -4966,6 +5322,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -4982,7 +5340,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Iroda -&gt; wwwx2 MS SQL RDP</description>
+            <description>[ALL] Iroda -&gt; wwwx2 MS SQL RDP</description>
+            <audit />
           </rule>
           <rule uuid="183a7bd9-ac0c-4d41-b048-da02c093f1d4">
             <enabled>1</enabled>
@@ -4993,6 +5352,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>ICMP</protocol>
@@ -5022,6 +5383,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -5038,7 +5401,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Iroda -&gt; wwwx2 MS SQL ping</description>
+            <description>[ALL] Iroda -&gt; wwwx2 MS SQL ping</description>
+            <audit />
           </rule>
           <rule uuid="223f05ea-3510-44fc-a162-20851a4495a1">
             <enabled>1</enabled>
@@ -5049,6 +5413,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>UDP</protocol>
@@ -5078,6 +5444,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -5094,7 +5462,8 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>Iroda -&gt; wwwx2 MS SQL Browser</description>
+            <description>[ALL] Iroda -&gt; wwwx2 MS SQL Browser</description>
+            <audit />
           </rule>
           <rule uuid="b44269dd-0ade-4ab2-98a0-3cbdc8d113dc">
             <enabled>1</enabled>
@@ -5105,6 +5474,8 @@ WS</content>
             <quick>1</quick>
             <interfacenot>0</interfacenot>
             <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
             <direction>in</direction>
             <ipprotocol>inet</ipprotocol>
             <protocol>TCP</protocol>
@@ -5112,7 +5483,7 @@ WS</content>
             <icmp6type />
             <source_net>A_HOST_GW</source_net>
             <source_not>0</source_not>
-            <source_port>4949</source_port>
+            <source_port />
             <destination_net>(self)</destination_net>
             <destination_not>0</destination_not>
             <destination_port>4949</destination_port>
@@ -5134,6 +5505,8 @@ WS</content>
             <max />
             <max-src-conn-rate />
             <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
             <overload />
             <adaptivestart />
             <adaptiveend />
@@ -5150,7 +5523,801 @@ WS</content>
             <tos />
             <shaper1 />
             <shaper2 />
-            <description>[ELES] Munin tűzfal</description>
+            <description>[ALL] Munin tűzfal</description>
+            <audit />
+          </rule>
+          <rule uuid="80d819db-a23b-41fe-aa08-a25dcf6dee67">
+            <enabled>1</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>133</sequence>
+            <action>block</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt2,opt3,opt4,opt5,opt6,opt7,openvpn,wireguard</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>TCP/UDP</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>any</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>A_NET_RFC1918</destination_net>
+            <destination_not>1</destination_not>
+            <destination_port>A_PORT_P2P</destination_port>
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>1</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] TILTÁS: P2P/BitTorrent kifelé</description>
+            <audit />
+          </rule>
+          <rule uuid="13ca80c6-beca-40be-81f1-bdc49fdbe83e">
+            <enabled>1</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>134</sequence>
+            <action>block</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt3,opt4,opt5,opt6</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>TCP/UDP</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>any</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>A_NET_RFC1918</destination_net>
+            <destination_not>1</destination_not>
+            <destination_port>A_PORT_DNS_EXT</destination_port>
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>1</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] TILTÁS: külső DNS/DoT (csak a belső resolver)</description>
+            <audit />
+          </rule>
+          <rule uuid="0d3d2229-b964-4442-9c59-7202b0246a2c">
+            <enabled>0</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>2031</sequence>
+            <action>pass</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt8</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>TCP</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>any</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>A_HOST_GW</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port>A_PORT_MAIL_CLIENT_226</destination_port>
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>0</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ELES] Postfix/Dovecot portok -&gt; 226.3 (GEO tiltás után)</description>
+            <audit />
+          </rule>
+          <rule uuid="3229c647-93f5-4f57-8dc3-cd894c804dfe">
+            <enabled>1</enabled>
+            <statetype>sloppy</statetype>
+            <state-policy />
+            <sequence>515</sequence>
+            <action>pass</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>any</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>A_MAC_VOIP_PHONES</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>any</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port />
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>0</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[TESZT] VoIP telefonok – sloppy state az aszimmetrikus útvonal miatt</description>
+            <audit />
+          </rule>
+          <rule uuid="d27e9144-70c5-427b-ab56-853bd91179ef">
+            <enabled>1</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>2671</sequence>
+            <action>pass</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt7</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>TCP</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>A_NET_226</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>A_HOST_WWWX2</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port>A_PORT_WWWX2_WEB</destination_port>
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>0</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories>9557729d-3851-4f38-b96f-153344e3bbdf</categories>
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] 226 -&gt; wwwx2 app 19000-19500</description>
+            <audit />
+          </rule>
+          <rule uuid="e45b8c97-ce5a-4738-a995-9ad00780e654">
+            <enabled>1</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>2746</sequence>
+            <action>pass</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt12</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>TCP/UDP</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>opt12</source_net>
+            <source_not>0</source_not>
+            <source_port>A_PORT_DNS_53</source_port>
+            <destination_net>opt12ip</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port>A_PORT_DNS_53</destination_port>
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>0</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] DNS az Unboundra</description>
+            <audit>eyJjcmVhdGVkIjp7InVzZXJuYW1lIjoicm96c2F5QDE5Mi4xNjguMzAuNzEiLCJ0aW1lIjoiMTc5NDIwNTYwMi45MCIsImRlc2NyaXB0aW9uIjoiXC9hcGlcL2FwaS5waHAgbWFkZSBjaGFuZ2VzIn0sInVwZGF0ZWQiOnsidXNlcm5hbWUiOiJyb3pzYXlAMTkyLjE2OC4zMC43MSIsInRpbWUiOiIxNzk0MjA4NjEyLjQ4IiwiZGVzY3JpcHRpb24iOiJcL2FwaVwvYXBpLnBocCBtYWRlIGNoYW5nZXMifSwidXNlcmRhdGEiOnsibm90ZSI6IiJ9fQ==</audit>
+          </rule>
+          <rule uuid="eaf45100-a60b-4338-98ce-79cfd450136e">
+            <enabled>1</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>2771</sequence>
+            <action>pass</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt12</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>ICMP</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>opt12</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>opt12ip</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port />
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>0</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] ping a gatewayre</description>
+            <audit>eyJjcmVhdGVkIjp7InVzZXJuYW1lIjoicm96c2F5QDE5Mi4xNjguMzAuNzEiLCJ0aW1lIjoiMTc5NDIwNTY3MS40NSIsImRlc2NyaXB0aW9uIjoiXC9hcGlcL2FwaS5waHAgbWFkZSBjaGFuZ2VzIn0sInVwZGF0ZWQiOnsidXNlcm5hbWUiOiJyb3pzYXlAMTkyLjE2OC4zMC43MSIsInRpbWUiOiIxNzk0MjA4NjE4LjY5IiwiZGVzY3JpcHRpb24iOiJcL2FwaVwvYXBpLnBocCBtYWRlIGNoYW5nZXMifSwidXNlcmRhdGEiOnsibm90ZSI6IiJ9fQ==</audit>
+          </rule>
+          <rule uuid="7f88d728-fcbd-4a52-ba66-3559406d40c1">
+            <enabled>1</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>2821</sequence>
+            <action>pass</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt12</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>TCP</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>opt12</source_net>
+            <source_not>0</source_not>
+            <source_port>A_PORT_MAIL_CLIENT_226</source_port>
+            <destination_net>A_HOST_GW</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port />
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>0</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] levelezés a gw-re</description>
+            <audit>eyJjcmVhdGVkIjp7InVzZXJuYW1lIjoicm96c2F5QDE5Mi4xNjguMzAuNzEiLCJ0aW1lIjoiMTc5NDIwNTczNC45NCIsImRlc2NyaXB0aW9uIjoiXC9hcGlcL2FwaS5waHAgbWFkZSBjaGFuZ2VzIn0sInVwZGF0ZWQiOnsidXNlcm5hbWUiOiJyb3pzYXlAMTkyLjE2OC4zMC43MSIsInRpbWUiOiIxNzk0MjA4NjIzLjc4IiwiZGVzY3JpcHRpb24iOiJcL2FwaVwvYXBpLnBocCBtYWRlIGNoYW5nZXMifSwidXNlcmRhdGEiOnsibm90ZSI6IiJ9fQ==</audit>
+          </rule>
+          <rule uuid="280a3fa1-12c3-44ba-8d6d-cdb61dd07155">
+            <enabled>0</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>2971</sequence>
+            <action>block</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt12</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>any</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>opt12</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>(self)</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port />
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>1</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] GUI és SSH tiltása, log be</description>
+            <audit>eyJjcmVhdGVkIjp7InVzZXJuYW1lIjoicm96c2F5QDE5Mi4xNjguMzAuNzEiLCJ0aW1lIjoiMTc5NDIwNTgzMC44NSIsImRlc2NyaXB0aW9uIjoiXC9hcGlcL2FwaS5waHAgbWFkZSBjaGFuZ2VzIn0sInVwZGF0ZWQiOnsidXNlcm5hbWUiOiJyb3pzYXlAMTkyLjE2OC4zMC43MSIsInRpbWUiOiIxNzk0MjA4NjI5LjM4IiwiZGVzY3JpcHRpb24iOiJcL2FwaVwvYXBpLnBocCBtYWRlIGNoYW5nZXMifSwidXNlcmRhdGEiOnsibm90ZSI6IiJ9fQ==</audit>
+          </rule>
+          <rule uuid="811357d4-0f46-4753-acf2-bb123324f548">
+            <enabled>0</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>2996</sequence>
+            <action>block</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt12</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>any</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>opt12</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>A_NET_RFC1918</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port />
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>1</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] belső hálók tiltása, log be</description>
+            <audit>eyJjcmVhdGVkIjp7InVzZXJuYW1lIjoicm96c2F5QDE5Mi4xNjguMzAuNzEiLCJ0aW1lIjoiMTc5NDIwNTg4Ny42OCIsImRlc2NyaXB0aW9uIjoiXC9hcGlcL2FwaS5waHAgbWFkZSBjaGFuZ2VzIn0sInVwZGF0ZWQiOnsidXNlcm5hbWUiOiJyb3pzYXlAMTkyLjE2OC4zMC43MSIsInRpbWUiOiIxNzk0MjA4NjM1LjQwIiwiZGVzY3JpcHRpb24iOiJcL2FwaVwvYXBpLnBocCBtYWRlIGNoYW5nZXMifSwidXNlcmRhdGEiOnsibm90ZSI6IiJ9fQ==</audit>
+          </rule>
+          <rule uuid="45d1b887-89b7-4fae-a4fe-2968a222c7fd">
+            <enabled>1</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>3021</sequence>
+            <action>pass</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt12</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>any</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>opt12</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>any</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port />
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>0</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] internet</description>
+            <audit>eyJjcmVhdGVkIjp7InVzZXJuYW1lIjoicm96c2F5QDE5Mi4xNjguMzAuNzEiLCJ0aW1lIjoiMTc5NDIwNTkzMi42OSIsImRlc2NyaXB0aW9uIjoiXC9hcGlcL2FwaS5waHAgbWFkZSBjaGFuZ2VzIn0sInVwZGF0ZWQiOnsidXNlcm5hbWUiOiJyb3pzYXlAMTkyLjE2OC4zMC43MSIsInRpbWUiOiIxNzk0MjA4NjQwLjM4IiwiZGVzY3JpcHRpb24iOiJcL2FwaVwvYXBpLnBocCBtYWRlIGNoYW5nZXMifSwidXNlcmRhdGEiOnsibm90ZSI6IiJ9fQ==</audit>
+          </rule>
+          <rule uuid="a70cd274-369e-44ba-ba39-9b39e78d63e7">
+            <enabled>1</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>2846</sequence>
+            <action>pass</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt12</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>any</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>A_HOST_WLAN_INFRA</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>opt2</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port />
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>0</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] WLAN megbízható -&gt; INFRA</description>
+            <audit>eyJjcmVhdGVkIjp7InVzZXJuYW1lIjoicm96c2F5QDE5Mi4xNjguMzAuNzEiLCJ0aW1lIjoiMTc5NDIyNzExOS43NCIsImRlc2NyaXB0aW9uIjoiXC9hcGlcL2FwaS5waHAgbWFkZSBjaGFuZ2VzIn0sInVwZGF0ZWQiOnsidXNlcm5hbWUiOiJyb3pzYXlAMTkyLjE2OC4zMC43MSIsInRpbWUiOiIxNzk0MjI3MTE5Ljc0IiwiZGVzY3JpcHRpb24iOiJcL2FwaVwvYXBpLnBocCBtYWRlIGNoYW5nZXMifSwidXNlcmRhdGEiOnsibm90ZSI6IiJ9fQ==</audit>
+          </rule>
+          <rule uuid="a39db303-d886-4c3e-99ad-180969063373">
+            <enabled>1</enabled>
+            <statetype>keep</statetype>
+            <state-policy />
+            <sequence>2871</sequence>
+            <action>pass</action>
+            <quick>1</quick>
+            <interfacenot>0</interfacenot>
+            <interface>opt12</interface>
+            <received-on-not>0</received-on-not>
+            <received-on />
+            <direction>in</direction>
+            <ipprotocol>inet</ipprotocol>
+            <protocol>any</protocol>
+            <icmptype />
+            <icmp6type />
+            <source_net>A_HOST_WLAN_LAN226</source_net>
+            <source_not>0</source_not>
+            <source_port />
+            <destination_net>opt2</destination_net>
+            <destination_not>0</destination_not>
+            <destination_port />
+            <divert-to />
+            <gateway />
+            <replyto />
+            <disablereplyto>0</disablereplyto>
+            <log>0</log>
+            <allowopts>0</allowopts>
+            <nosync>0</nosync>
+            <nopfsync>0</nopfsync>
+            <statetimeout />
+            <udp-first />
+            <udp-multiple />
+            <udp-single />
+            <max-src-nodes />
+            <max-src-states />
+            <max-src-conn />
+            <max />
+            <max-src-conn-rate />
+            <max-src-conn-rates />
+            <max-pkt-rate-number />
+            <max-pkt-rate-seconds />
+            <overload />
+            <adaptivestart />
+            <adaptiveend />
+            <prio />
+            <set-prio />
+            <set-prio-low />
+            <tag />
+            <tagged />
+            <tcpflags1 />
+            <tcpflags2 />
+            <tcpflags_any>0</tcpflags_any>
+            <categories />
+            <sched />
+            <tos />
+            <shaper1 />
+            <shaper2 />
+            <description>[ALL] WLAN megbízható -&gt; iroda</description>
+            <audit>eyJjcmVhdGVkIjp7InVzZXJuYW1lIjoicm96c2F5QDE5Mi4xNjguMzAuNzEiLCJ0aW1lIjoiMTc5NDIyNzE3MC4xOSIsImRlc2NyaXB0aW9uIjoiXC9hcGlcL2FwaS5waHAgbWFkZSBjaGFuZ2VzIn0sInVwZGF0ZWQiOnsidXNlcm5hbWUiOiJyb3pzYXlAMTkyLjE2OC4zMC43MSIsInRpbWUiOiIxNzk0MjI3MTcwLjE5IiwiZGVzY3JpcHRpb24iOiJcL2FwaVwvYXBpLnBocCBtYWRlIGNoYW5nZXMifSwidXNlcmRhdGEiOnsibm90ZSI6IiJ9fQ==</audit>
           </rule>
         </rules>
         <snatrules />
@@ -5246,7 +6413,7 @@ WS</content>
           <http_port>8000</http_port>
         </general>
       </ctrl_agent>
-      <dhcp4 version="1.0.5" persisted_at="1792391029.39" description="Kea DHCPv4 configuration">
+      <dhcp4 version="1.0.7" persisted_at="1793163998.02" description="Kea DHCPv4 configuration">
         <general>
           <enabled>0</enabled>
           <manual_config>0</manual_config>
@@ -5277,7 +6444,7 @@ WS</content>
         <options />
         <ha_peers />
       </dhcp4>
-      <dhcp6 version="1.0.2" persisted_at="1792391029.32" description="Kea DHCPv6 configuration">
+      <dhcp6 version="1.0.3" persisted_at="1793163997.96" description="Kea DHCPv6 configuration">
         <general>
           <enabled>0</enabled>
           <manual_config>0</manual_config>
@@ -5533,10 +6700,10 @@ WS</content>
         <disabled>1</disabled>
         <name>OPT8_PPPOE_PPPOE</name>
         <descr>Interface OPT8_PPPOE_PPPOE Gateway</descr>
-        <interface>lan</interface>
+        <interface>opt8</interface>
         <ipprotocol>inet</ipprotocol>
         <gateway />
-        <defaultgw>1</defaultgw>
+        <defaultgw>0</defaultgw>
         <fargw>0</fargw>
         <monitor_disable>0</monitor_disable>
         <monitor_noroute>0</monitor_noroute>
@@ -5614,7 +6781,7 @@ WS</content>
       </rules>
     </TrafficShaper>
     <trust>
-      <general version="1.0.1" persisted_at="1792649756.37" description="Trust general settings">
+      <general version="1.0.2" persisted_at="1793163996.82" description="Trust general settings">
         <store_intermediate_certs>0</store_intermediate_certs>
         <install_crls>0</install_crls>
         <fetch_crls>0</fetch_crls>
@@ -5628,7 +6795,7 @@ WS</content>
         <MinProtocol_DTLS />
       </general>
     </trust>
-    <unboundplus version="1.0.15" persisted_at="1792391029.21" description="Unbound configuration">
+    <unboundplus version="1.0.15" persisted_at="1794205105.50" description="Unbound configuration">
       <general>
         <enabled>1</enabled>
         <port>53</port>
@@ -5651,8 +6818,8 @@ WS</content>
         <enable_wpad>0</enable_wpad>
       </general>
       <advanced>
-        <hideidentity>0</hideidentity>
-        <hideversion>0</hideversion>
+        <hideidentity>1</hideidentity>
+        <hideversion>1</hideversion>
         <prefetch>0</prefetch>
         <prefetchkey>0</prefetchkey>
         <dnssecstripped>0</dnssecstripped>
@@ -5732,20 +6899,46 @@ WS</content>
       <hosts>
         <host uuid="75ac914f-d29e-47cb-8cff-aca5ad7aa949">
           <enabled>1</enabled>
-          <hostname>gw2</hostname>
+          <hostname>lovas</hostname>
           <domain>topsoft.hu</domain>
           <rr>A</rr>
           <mxprio />
           <mx />
           <ttl />
-          <server>192.168.226.4</server>
+          <server>192.168.226.15</server>
           <txtdata />
           <addptr>1</addptr>
-          <description>gw2 gép az istopsoft hoz</description>
+          <description>wwwx gép az istopsoft hoz</description>
         </host>
         <host uuid="e762bb50-e5d4-47a3-bebe-1aaace0e8aea">
           <enabled>1</enabled>
           <hostname>gw</hostname>
+          <domain>topsoft.hu</domain>
+          <rr>A</rr>
+          <mxprio />
+          <mx />
+          <ttl />
+          <server>192.168.226.3</server>
+          <txtdata />
+          <addptr>1</addptr>
+          <description>Description: Belső átirányítás a gw.topsoft.hu-ra</description>
+        </host>
+        <host uuid="b8be036d-af90-4e87-bc6a-bcb1329d11db">
+          <enabled>1</enabled>
+          <hostname>letoltes</hostname>
+          <domain>topsoft.hu</domain>
+          <rr>A</rr>
+          <mxprio />
+          <mx />
+          <ttl />
+          <server>192.168.226.3</server>
+          <txtdata />
+          <addptr>1</addptr>
+          <description>Description: Belső átirányítás a gw.topsoft.hu-ra</description>
+        </host>
+        <host uuid="c70f5814-6134-473a-babe-5eff5a0190ac">
+          <enabled>1</enabled>
+          <hostname>mail</hostname>
           <domain>topsoft.hu</domain>
           <rr>A</rr>
           <mxprio />
@@ -5763,6 +6956,20 @@ WS</content>
           <host>e762bb50-e5d4-47a3-bebe-1aaace0e8aea</host>
           <hostname>gw</hostname>
           <domain>topsoft.hu</domain>
+          <description />
+        </alias>
+        <alias uuid="cb651585-8643-443d-abff-75342f931b61">
+          <enabled>1</enabled>
+          <host>b8be036d-af90-4e87-bc6a-bcb1329d11db</host>
+          <hostname>gw</hostname>
+          <domain />
+          <description />
+        </alias>
+        <alias uuid="1646e53d-11ee-467f-9e81-12efee3c5543">
+          <enabled>1</enabled>
+          <host>c70f5814-6134-473a-babe-5eff5a0190ac</host>
+          <hostname>mail</hostname>
+          <domain />
           <description />
         </alias>
       </aliases>
@@ -5804,8 +7011,8 @@ WS</content>
     <redis version="0.0.0" persisted_at="1792650013.18" description="Redis DB">
       <general>
         <enabled>1</enabled>
-        <listen>opt1</listen>
-        <protected_mode>0</protected_mode>
+        <listen>lo0</listen>
+        <protected_mode>1</protected_mode>
         <port>6379</port>
         <log_level>warning</log_level>
         <syslog_enabled>0</syslog_enabled>
@@ -5978,7 +7185,7 @@ WS</content>
         <headers_more_enable>0</headers_more_enable>
       </http>
     </Nginx>
-    <AcmeClient version="4.4.0" persisted_at="1792649872.99" description="A secure ACME Client plugin">
+    <AcmeClient version="4.4.0" persisted_at="1792658873.83" description="A secure ACME Client plugin">
       <settings>
         <enabled>0</enabled>
         <autoRenewal>1</autoRenewal>
@@ -5998,7 +7205,7 @@ WS</content>
       <accounts>
         <account uuid="79be3d53-863a-4f98-a8f2-5981475f201c">
           <id>6ad72a935076d1.18876691</id>
-          <enabled>1</enabled>
+          <enabled>0</enabled>
           <name>sa@topsoft.hu</name>
           <description>sa@topsoft.hu</description>
           <email>sa@topsoft.hu</email>
@@ -6014,7 +7221,7 @@ WS</content>
       <certificates>
         <certificate uuid="68e0050e-ad7a-48d0-95fa-3fe65c7f4b1e">
           <id>6ad72b92b44a66.73217630</id>
-          <enabled>1</enabled>
+          <enabled>0</enabled>
           <name>tuzfal</name>
           <description />
           <altNames />
@@ -6038,7 +7245,7 @@ WS</content>
       <validations>
         <validation uuid="0deaa11b-455b-426c-950a-3a72e745d98d">
           <id>6ad72b746b0383.30470516</id>
-          <enabled>1</enabled>
+          <enabled>0</enabled>
           <name>tuzfal</name>
           <description>tuzfal</description>
           <method>http01</method>
@@ -6440,6 +7647,9 @@ WS</content>
         <allowednetworks>192.168.226.3</allowednetworks>
       </general>
     </muninnode>
+    <SystemHealth version="1.0.0" persisted_at="1793163994.16" description="RRD graphing backend configuration">
+      <enabled>1</enabled>
+    </SystemHealth>
   </OPNsense>
   <hasync version="1.0.2" persisted_at="1784638032.63">
     <disablepreempt>0</disablepreempt>
@@ -6454,7 +7664,7 @@ WS</content>
     <syncitems />
   </hasync>
   <openvpn />
-  <ifgroups version="1.0.0" persisted_at="1790936523.39" description="Firewall interface groups">
+  <ifgroups version="1.0.0" persisted_at="1794204652.43" description="Firewall interface groups">
     <ifgroupentry uuid="4c3115f8-386f-4ff5-b31c-15f6b922ecaf">
       <ifname>G_MGMT</ifname>
       <members>opt1</members>
@@ -6518,6 +7728,13 @@ WS</content>
       <sequence>0</sequence>
       <descr />
     </ifgroupentry>
+    <ifgroupentry uuid="6a48885b-76fc-4bc0-b51b-2235d3cc9222">
+      <ifname>G_WLAN</ifname>
+      <members>opt12</members>
+      <nogroup>0</nogroup>
+      <sequence>0</sequence>
+      <descr />
+    </ifgroupentry>
   </ifgroups>
   <bridges version="1.0.0" persisted_at="1784638033.66">
     <bridged />
@@ -6550,13 +7767,13 @@ WS</content>
       <descr>Ideiglenes GUI/SSH elérés LAN2 (natív 226/24) szegmensről</descr>
     </vip>
   </virtualip>
-  <vlans version="1.0.0" persisted_at="1784706211.29">
+  <vlans version="1.0.0" persisted_at="1794216273.06" description="VLAN configuration">
     <vlan uuid="75965702-22aa-46fd-9e30-69a39410e6df">
       <if>igb0</if>
       <tag>10</tag>
       <pcp>0</pcp>
       <proto />
-      <descr>MGMT</descr>
+      <descr>MGMT_10</descr>
       <vlanif>vlan010</vlanif>
     </vlan>
     <vlan uuid="86252a5b-d09b-4f12-8973-7a8effc4fe63">
@@ -6564,7 +7781,7 @@ WS</content>
       <tag>20</tag>
       <pcp>0</pcp>
       <proto />
-      <descr>INFRA-SZERVER</descr>
+      <descr>INFRA-SZERVER_20</descr>
       <vlanif>vlan020</vlanif>
     </vlan>
     <vlan uuid="db3196c5-effb-4266-8353-e90ae18d98f5">
@@ -6572,7 +7789,7 @@ WS</content>
       <tag>30</tag>
       <pcp>0</pcp>
       <proto />
-      <descr>FEJLESZTOI</descr>
+      <descr>FEJLESZTOI_30</descr>
       <vlanif>vlan030</vlanif>
     </vlan>
     <vlan uuid="cc741e11-d15a-4a5f-8f39-e01b73582399">
@@ -6580,7 +7797,7 @@ WS</content>
       <tag>50</tag>
       <pcp>0</pcp>
       <proto />
-      <descr>VOICE</descr>
+      <descr>VOICE_50</descr>
       <vlanif>vlan050</vlanif>
     </vlan>
     <vlan uuid="175cc551-9843-487a-8a5a-af41feb4312a">
@@ -6588,7 +7805,7 @@ WS</content>
       <tag>60</tag>
       <pcp>0</pcp>
       <proto />
-      <descr>PRINT-IoT-ACCESS_vlan60</descr>
+      <descr>PRINT-IoT-ACCESS_60</descr>
       <vlanif>vlan060</vlanif>
     </vlan>
     <vlan uuid="326a2305-3276-4148-92d1-86a5eed68fe5">
@@ -6596,16 +7813,16 @@ WS</content>
       <tag>40</tag>
       <pcp>0</pcp>
       <proto />
-      <descr>vlan40_OFFICE</descr>
+      <descr>OFFICE_40</descr>
       <vlanif>vlan040</vlanif>
     </vlan>
     <vlan uuid="8965c394-12c7-4d1d-bfaf-52650156dcc9">
       <if>igb0</if>
-      <tag>7</tag>
+      <tag>70</tag>
       <pcp>0</pcp>
       <proto />
-      <descr>WLAN_07</descr>
-      <vlanif>vlan0.1.7</vlanif>
+      <descr>WLAN_70</descr>
+      <vlanif>vlan070</vlanif>
     </vlan>
   </vlans>
   <staticroutes version="1.0.1" persisted_at="1792391029.20" description="Static routes" />
@@ -6625,9 +7842,7 @@ WS</content>
       <mrru />
     </ppp>
   </ppps>
-  <wireless>
-    <clone />
-  </wireless>
+  <wireless version="1.0.0" persisted_at="1793163997.27" description="Wireless configuration" />
   <dhcpd>
     <opt1>
       <enable>1</enable>
@@ -6854,6 +8069,82 @@ WS</content>
         <ntpserver />
       </staticmap>
     </opt7>
+    <opt12>
+      <enable>1</enable>
+      <domain>topsoft.hu</domain>
+      <domainsearchlist>topsoft.hu</domainsearchlist>
+      <ddnsdomainalgorithm>hmac-md5</ddnsdomainalgorithm>
+      <numberoptions>
+        <item />
+      </numberoptions>
+      <range>
+        <from>192.168.70.100</from>
+        <to>192.168.70.149</to>
+      </range>
+      <winsserver />
+      <dnsserver />
+      <ntpserver />
+      <staticmap>
+        <mac>18:69:45:e2:06:f9</mac>
+        <cid>TPLINK-Archer</cid>
+        <ipaddr>192.168.70.2</ipaddr>
+        <hostname>ArcherAX55</hostname>
+        <descr>Router mode</descr>
+        <winsserver />
+        <dnsserver />
+        <ntpserver />
+      </staticmap>
+      <staticmap>
+        <mac>18:69:45:e2:06:f8</mac>
+        <cid>ArcherAX55</cid>
+        <ipaddr>192.168.70.2</ipaddr>
+        <hostname>ArcherAX55</hostname>
+        <descr>Access Point Mode</descr>
+        <winsserver />
+        <dnsserver />
+        <ntpserver />
+      </staticmap>
+      <staticmap>
+        <mac>b6:44:b7:02:37:5e</mac>
+        <cid>VinczeMobil</cid>
+        <ipaddr>192.168.70.62</ipaddr>
+        <hostname>VinczeMobil</hostname>
+        <descr>Redmi-Note-14-Pro-5G</descr>
+        <winsserver />
+        <dnsserver />
+        <ntpserver />
+      </staticmap>
+      <staticmap>
+        <mac>28:9f:04:a6:51:13</mac>
+        <cid>PetiMobil</cid>
+        <ipaddr>192.168.70.63</ipaddr>
+        <hostname>PetiMobil</hostname>
+        <descr>Samsung A56</descr>
+        <winsserver />
+        <dnsserver />
+        <ntpserver />
+      </staticmap>
+      <staticmap>
+        <mac>a8:ba:69:9f:60:f5</mac>
+        <cid>Lendvai</cid>
+        <ipaddr>192.168.70.69</ipaddr>
+        <hostname>LfMobilS24</hostname>
+        <descr>Samsung S24</descr>
+        <winsserver />
+        <dnsserver />
+        <ntpserver />
+      </staticmap>
+      <staticmap>
+        <mac>f8:43:ef:56:67:40</mac>
+        <cid>RozsayMobil</cid>
+        <ipaddr>192.168.70.71</ipaddr>
+        <hostname>RozsayMobil</hostname>
+        <descr>Redmi-Note-14-Pro</descr>
+        <winsserver />
+        <dnsserver />
+        <ntpserver />
+      </staticmap>
+    </opt12>
   </dhcpd>
   <dhcpdv6>
     <lan>
@@ -7016,17 +8307,24 @@ WS</content>
     <caref />
   </ca>
   <gateways>
-    <gateway_group>
+    <gateway_group uuid="406b0d08-1086-4e3c-8801-762c34519f73">
       <name>GW_FAILOVER</name>
-      <item>LAN_GW|2</item>
-      <item>OPT8_PPPOE_PPPOE|1</item>
+      <item2>LAN_GW</item2>
+      <item3 />
+      <item4 />
+      <item5 />
+      <item>OPT8_PPPOE_PPPOE</item>
       <trigger>down</trigger>
       <poolopts />
       <descr>GW_FAILOVER</descr>
     </gateway_group>
-    <gateway_group>
+    <gateway_group uuid="607fc363-f93b-4e45-a42c-7c3fcc2ef5a1">
       <name>PPPOE_MODE</name>
-      <item>OPT8_PPPOE_PPPOE|1</item>
+      <item2 />
+      <item3 />
+      <item4 />
+      <item5 />
+      <item>OPT8_PPPOE_PPPOE</item>
       <trigger>down</trigger>
       <poolopts />
       <descr>PPPOE_MODE</descr>
